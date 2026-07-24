@@ -24,3 +24,41 @@ export const masterData = {
   sizes: ["Micro", "Small", "Medium", "Large"],
   statuses: ["Active", "Pending verification", "Suspended", "Closed"],
 };
+
+let nextNum = 1009;
+
+/**
+ * Shared factory used both by the authenticated admin "create enterprise"
+ * route and the public self-registration endpoint, so both paths produce
+ * consistent records with guaranteed-unique IDs.
+ */
+export function createEnterprise(body = {}, overrides = {}) {
+  const item = {
+    id: `ENT-${nextNum++}`,
+    name: body.name || "Untitled Enterprise",
+    tradeName: body.tradeName || body.name || "",
+    tin: body.tin || "",
+    sector: body.sector || masterData.sectors[0],
+    subsector: body.subsector || "",
+    isic: body.isic || "",
+    region: body.region || masterData.regions[0],
+    zone: body.zone || "",
+    size: body.size || masterData.sizes[0],
+    ownership: body.ownership || "Domestic private",
+    employees: Number(body.employees) || 0,
+    exportStatus: body.exportStatus || "Domestic",
+    status: body.status || "Pending verification",
+    establishedYear: Number(body.establishedYear) || new Date().getFullYear(),
+    lat: Number(body.lat) || 9.02,
+    lng: Number(body.lng) || 38.75,
+    manager: body.manager || "",
+    phone: body.phone || "",
+    email: body.email || "",
+    industrialPark: body.industrialPark || "—",
+    capacityUtilization: Number(body.capacityUtilization) || 0,
+    source: "admin",
+    ...overrides,
+  };
+  enterprises.push(item);
+  return item;
+}

@@ -1,9 +1,8 @@
 import { Router } from "express";
-import { enterprises, sectorSummary, masterData } from "../data/enterprises.js";
+import { enterprises, sectorSummary, masterData, createEnterprise } from "../data/enterprises.js";
 import { authorize } from "../middleware/auth.js";
 
 const router = Router();
-let nextNum = 1009;
 
 function scopeToOwnEnterprise(items, user) {
   return user.role === "enterprise" ? items.filter((e) => e.name === user.enterpriseName) : items;
@@ -38,31 +37,7 @@ router.get("/:id", authorize("enterprises", "view"), (req, res, next) => {
 });
 
 router.post("/", authorize("enterprises", "create"), (req, res) => {
-  const body = req.body || {};
-  const item = {
-    id: `ENT-${nextNum++}`,
-    name: body.name || "Untitled Enterprise",
-    tradeName: body.tradeName || body.name || "",
-    tin: body.tin || "",
-    sector: body.sector || masterData.sectors[0],
-    subsector: body.subsector || "",
-    isic: body.isic || "",
-    region: body.region || masterData.regions[0],
-    zone: body.zone || "",
-    size: body.size || masterData.sizes[0],
-    ownership: body.ownership || "Domestic private",
-    employees: Number(body.employees) || 0,
-    exportStatus: body.exportStatus || "Domestic",
-    status: body.status || "Pending verification",
-    establishedYear: Number(body.establishedYear) || new Date().getFullYear(),
-    lat: Number(body.lat) || 9.02,
-    lng: Number(body.lng) || 38.75,
-    manager: body.manager || "",
-    phone: body.phone || "",
-    industrialPark: body.industrialPark || "—",
-    capacityUtilization: Number(body.capacityUtilization) || 0,
-  };
-  enterprises.push(item);
+  const item = createEnterprise(req.body || {});
   res.status(201).json({ item });
 });
 
