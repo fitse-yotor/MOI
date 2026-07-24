@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 260" width="320" height="260">
+  <defs>
+    <style>
+      .navy { fill: #2B2A82; }
+    </style>
+  </defs>
+
+  <g class="navy">
+    <rect x="146" y="6" width="28" height="34" rx="3"/>
+    <rect x="146" y="6" width="28" height="34" rx="3" transform="rotate(45 160 150)"/>
+    <rect x="146" y="6" width="28" height="34" rx="3" transform="rotate(90 160 150)"/>
+    <rect x="146" y="6" width="28" height="34" rx="3" transform="rotate(135 160 150)"/>
+    <rect x="146" y="6" width="28" height="34" rx="3" transform="rotate(180 160 150)"/>
+    <rect x="146" y="6" width="28" height="34" rx="3" transform="rotate(225 160 150)"/>
+    <rect x="146" y="6" width="28" height="34" rx="3" transform="rotate(270 160 150)"/>
+    <rect x="146" y="6" width="28" height="34" rx="3" transform="rotate(315 160 150)"/>
+  </g>
+
+  <circle cx="160" cy="150" r="96" fill="#FFFFFF" stroke="#2B2A82" stroke-width="26"/>
+  <path d="M 44 214 Q 160 250 276 214 L 276 236 Q 160 272 44 236 Z" fill="#FFDD00"/>
+  <circle cx="160" cy="150" r="96" fill="none" stroke="#2B2A82" stroke-width="26"/>
+
+  <g class="navy">
+    <rect x="112" y="152" width="96" height="72"/>
+    <rect x="176" y="100" width="18" height="56"/>
+    <path d="M187 84 q13 -3 7 13 q9 -7 2 13 q-9 6 -17 -5 q-6 -13 8 -21 z" fill="#3FA34D"/>
+    <rect x="124" y="168" width="15" height="15" fill="#FFFFFF"/>
+    <rect x="152" y="168" width="15" height="15" fill="#FFFFFF"/>
+    <rect x="180" y="168" width="15" height="15" fill="#FFFFFF"/>
+    <rect x="124" y="196" width="15" height="15" fill="#FFFFFF"/>
+    <rect x="152" y="196" width="15" height="15" fill="#FFFFFF"/>
+    <rect x="180" y="196" width="15" height="15" fill="#FFFFFF"/>
+  </g>
+</svg>

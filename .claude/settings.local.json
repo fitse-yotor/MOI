@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"/Users/fitsumtesfaye/Documents/Industry/backend/src/data\" \\\\ *)",
+      "Bash(cp .env.example .env)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:4000/health)",
+      "Bash(curl -s http://localhost:4000/api/dashboard/summary?role=federal)",
+      "Bash(curl -s http://localhost:4000/api/enterprises)",
+      "Bash(curl -s \"http://localhost:4000/api/dashboard/summary?role=federal\")",
+      "Bash(curl -s \"http://localhost:4000/api/notifications\")",
+      "Bash(curl -s \"http://localhost:4000/api/gis/points\")",
+      "Read(//tmp/**)",
+      "Bash(curl -s http://localhost:5173/)",
+      "Bash(chromium-cli --help)",
+      "Bash(node -e \"require.resolve\\('playwright'\\)\")",
+      "Bash(npx --no-install playwright --version)",
+      "Bash(npm init *)",
+      "Read(//Applications/Google Chrome.app/Contents/MacOS/**)",
+      "Read(//Applications/**)",
+      "Bash(lsof -ti:4000 -sTCP:LISTEN)",
+      "Bash(xargs -r kill)"
+    ],
+    "additionalDirectories": [
+      "/Users/fitsumtesfaye/Documents/Industry/backend/src"
+    ]
+  }
+}
