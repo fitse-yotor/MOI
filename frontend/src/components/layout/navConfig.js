@@ -28,6 +28,13 @@ export const NAV_GROUPS = [
     ],
   },
   {
+    group: "Licensing",
+    items: [
+      { id: "licenses", path: "/licenses", label: "Licenses & Certificates", icon: "licenses" },
+      { id: "licenseTemplates", module: "licenses", path: "/licenses/templates", label: "License Templates", icon: "template" },
+    ],
+  },
+  {
     group: "Administration",
     items: [
       { id: "users", path: "/users", label: "Users & Access", icon: "users" },
@@ -48,6 +55,10 @@ export const PAGE_META = {
   "/benchmark": ["Benchmark & International Data", "Comparison against peer countries"],
   "/linkage": ["B2B Linkage & Market Opportunities", "Buyers, suppliers, investors and partners"],
   "/notifications": ["Notifications", "System and workflow alerts"],
+  "/licenses": ["Licenses & Certificates", "Issue, renew and close enterprise licenses"],
+  "/licenses/issue": ["Issue License", "Issue a new license or certificate to a registered enterprise"],
+  "/licenses/templates": ["License Templates", "Design and manage license certificate templates"],
+  "/licenses/templates/new": ["New License Template", "Build a new license certificate template"],
   "/users": ["Users & Access", "Role-based access control"],
   "/audit": ["Audit Log", "Login, action and data-change history"],
   "/config": ["Configuration & Master Data", "System parameters and reference data"],

@@ -35,11 +35,20 @@ import UserViewPage from "../pages/Users/UserViewPage.jsx";
 import AuditPage from "../pages/Audit/AuditPage.jsx";
 import ConfigPage from "../pages/Config/ConfigPage.jsx";
 
+import LicensesPage from "../pages/Licenses/LicensesPage.jsx";
+import LicenseIssuePage from "../pages/Licenses/LicenseIssuePage.jsx";
+import LicenseViewPage from "../pages/Licenses/LicenseViewPage.jsx";
+import LicenseTemplatesPage from "../pages/Licenses/LicenseTemplatesPage.jsx";
+import LicenseTemplateBuilderPage from "../pages/Licenses/LicenseTemplateBuilderPage.jsx";
+
+import TelebirrCheckoutPage from "../pages/Payments/TelebirrCheckoutPage.jsx";
+
 export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/apply" element={<Apply />} />
+      <Route path="/payments/:id" element={<ProtectedRoute><TelebirrCheckoutPage /></ProtectedRoute>} />
       <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
         <Route path="/" element={<Dashboard />} />
 
@@ -77,6 +86,13 @@ export default function AppRoutes() {
 
         <Route path="/audit" element={<AuditPage />} />
         <Route path="/config" element={<ConfigPage />} />
+
+        <Route path="/licenses" element={<LicensesPage />} />
+        <Route path="/licenses/issue" element={<LicenseIssuePage />} />
+        <Route path="/licenses/templates" element={<LicenseTemplatesPage />} />
+        <Route path="/licenses/templates/new" element={<LicenseTemplateBuilderPage />} />
+        <Route path="/licenses/templates/:id/edit" element={<LicenseTemplateBuilderPage />} />
+        <Route path="/licenses/:id" element={<LicenseViewPage />} />
       </Route>
     </Routes>
   );

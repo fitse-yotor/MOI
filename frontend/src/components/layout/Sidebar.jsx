@@ -17,7 +17,7 @@ export default function Sidebar({ open }) {
       </div>
       <nav className="nav-scroll">
         {NAV_GROUPS.map((g) => {
-          const items = g.items.filter((item) => can(item.id, "view"));
+          const items = g.items.filter((item) => can(item.module || item.id, "view"));
           if (!items.length) return null;
           return (
             <div className="nav-group" key={g.group}>

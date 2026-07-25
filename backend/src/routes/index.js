@@ -12,6 +12,8 @@ import notificationsRoutes from "./notifications.routes.js";
 import usersRoutes from "./users.routes.js";
 import auditRoutes from "./audit.routes.js";
 import configRoutes from "./config.routes.js";
+import licensesRoutes from "./licenses.routes.js";
+import paymentsRoutes from "./payments.routes.js";
 
 const router = Router();
 
@@ -28,5 +30,7 @@ router.use("/notifications", notificationsRoutes);
 router.use("/users", usersRoutes);
 router.use("/audit", auditRoutes);
 router.use("/config", configRoutes);
+router.use("/licenses", licensesRoutes);
+router.use("/payments", paymentsRoutes);
 
 export default router;
