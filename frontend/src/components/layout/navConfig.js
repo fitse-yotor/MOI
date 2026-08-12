@@ -16,7 +16,7 @@ export const NAV_GROUPS = [
     items: [
       { id: "gis", path: "/gis", label: "GIS & Maps", icon: "gis" },
       { id: "analytics", path: "/analytics", label: "Analytics Dashboards", icon: "analytics" },
-      { id: "reports", path: "/reports", label: "Reports", icon: "reports" },
+      { id: "reports", path: "/reports", label: "Reporting", icon: "reports" },
       { id: "benchmark", path: "/benchmark", label: "Benchmark", icon: "benchmark" },
     ],
   },
@@ -25,6 +25,13 @@ export const NAV_GROUPS = [
     items: [
       { id: "linkage", path: "/linkage", label: "Linkage & Opportunities", icon: "linkage" },
       { id: "notifications", path: "/notifications", label: "Notifications", icon: "bell" },
+    ],
+  },
+  {
+    group: "Intelligence",
+    items: [
+      { id: "chat", path: "/chat", label: "AI Assistant", icon: "chat" },
+      { id: "advisory", path: "/advisory", label: "Minister's Advisory", icon: "advisory" },
     ],
   },
   {
@@ -51,7 +58,7 @@ export const PAGE_META = {
   "/review": ["Review & Approval", "Multi-level verification workflow"],
   "/gis": ["GIS & Spatial Reporting", "Geographic distribution of manufacturing enterprises"],
   "/analytics": ["Industry Analysis Dashboards", "Interactive indicators with drill-down"],
-  "/reports": ["Statistical & Non-Statistical Reporting", "Report catalogue and builder"],
+  "/reports": ["Reporting", "Report catalogue and builder"],
   "/benchmark": ["Benchmark & International Data", "Comparison against peer countries"],
   "/linkage": ["B2B Linkage & Market Opportunities", "Buyers, suppliers, investors and partners"],
   "/notifications": ["Notifications", "System and workflow alerts"],
@@ -62,4 +69,6 @@ export const PAGE_META = {
   "/users": ["Users & Access", "Role-based access control"],
   "/audit": ["Audit Log", "Login, action and data-change history"],
   "/config": ["Configuration & Master Data", "System parameters and reference data"],
+  "/chat": ["AI Assistant", "Ask about enterprises, infrastructure and market opportunities"],
+  "/advisory": ["Minister's Advisory", "Decision-support analysis for ministry officials"],
 };

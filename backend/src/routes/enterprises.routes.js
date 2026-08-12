@@ -10,7 +10,8 @@ function scopeToOwnEnterprise(items, user) {
 
 router.get("/", authorize("enterprises", "view"), (req, res) => {
   const { region, sector, size, status, q } = req.query;
-  let result = scopeToOwnEnterprise(enterprises, req.user);
+  const scoped = scopeToOwnEnterprise(enterprises, req.user);
+  let result = scoped;
   if (region && region !== "all") result = result.filter((e) => e.region === region);
   if (sector && sector !== "all") result = result.filter((e) => e.sector === sector);
   if (size && size !== "all") result = result.filter((e) => e.size === size);
@@ -19,7 +20,7 @@ router.get("/", authorize("enterprises", "view"), (req, res) => {
     const needle = q.toLowerCase();
     result = result.filter((e) => e.name.toLowerCase().includes(needle) || e.tin.includes(needle));
   }
-  res.json({ total: req.user.role === "enterprise" ? result.length : 12480, count: result.length, items: result, filters: masterData });
+  res.json({ total: scoped.length, count: result.length, items: result, filters: masterData });
 });
 
 router.get("/sectors", authorize("enterprises", "view"), (req, res) => {

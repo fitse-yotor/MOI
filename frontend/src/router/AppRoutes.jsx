@@ -3,6 +3,8 @@ import AppShell from "../components/layout/AppShell.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import Login from "../pages/Login.jsx";
 import Apply from "../pages/Apply.jsx";
+import SitePage from "../pages/Site/SitePage.jsx";
+import PublicChatPage from "../pages/PublicChat/PublicChatPage.jsx";
 import Dashboard from "../pages/Dashboard/Dashboard.jsx";
 
 import EnterprisesPage from "../pages/Enterprises/EnterprisesPage.jsx";
@@ -27,6 +29,8 @@ import OpportunityViewPage from "../pages/Linkage/OpportunityViewPage.jsx";
 
 import BenchmarkPage from "../pages/Benchmark/BenchmarkPage.jsx";
 import NotificationsPage from "../pages/Notifications/NotificationsPage.jsx";
+import ChatPage from "../pages/Chat/ChatPage.jsx";
+import MinisterChatPage from "../pages/MinisterChat/MinisterChatPage.jsx";
 
 import UsersPage from "../pages/Users/UsersPage.jsx";
 import UserFormPage from "../pages/Users/UserFormPage.jsx";
@@ -48,6 +52,8 @@ export default function AppRoutes() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/apply" element={<Apply />} />
+      <Route path="/site-chat" element={<PublicChatPage />} />
+      <Route path="/site/:slug" element={<SitePage />} />
       <Route path="/payments/:id" element={<ProtectedRoute><TelebirrCheckoutPage /></ProtectedRoute>} />
       <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
         <Route path="/" element={<Dashboard />} />
@@ -78,6 +84,9 @@ export default function AppRoutes() {
 
         <Route path="/benchmark" element={<BenchmarkPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
+        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/minister-chat" element={<MinisterChatPage />} />
+        <Route path="/advisory" element={<MinisterChatPage />} />
 
         <Route path="/users" element={<UsersPage />} />
         <Route path="/users/new" element={<UserFormPage />} />

@@ -1,23 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-import { api } from "../api/client.js";
 import Button from "../components/common/Button.jsx";
+import { DEMO_ACCOUNTS } from "../config/demoAccounts.js";
 
 export default function Login() {
   const { login, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [accounts, setAccounts] = useState([]);
+  const [accounts] = useState(DEMO_ACCOUNTS);
   const [showDemo, setShowDemo] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
-
-  useEffect(() => {
-    api.get("/auth/demo-accounts").then((res) => setAccounts(res.items)).catch(() => {});
-  }, []);
 
   useEffect(() => {
     if (user) navigate(location.state?.from?.pathname || "/", { replace: true });

@@ -6,12 +6,13 @@ const router = Router();
 let nextNum = 8;
 
 router.get("/", authorize("reports", "view"), (req, res) => {
-  const { category, q } = req.query;
+  const { category, type, q } = req.query;
   let result = reports;
   if (category && category !== "all") result = result.filter((r) => r.category === category);
+  if (type && type !== "all") result = result.filter((r) => r.type === type);
   if (q) {
     const needle = q.toLowerCase();
-    result = result.filter((r) => r.name.toLowerCase().includes(needle));
+    result = result.filter((r) => r.name.toLowerCase().includes(needle) || r.category.toLowerCase().includes(needle));
   }
   res.json({ items: result });
 });

@@ -77,14 +77,26 @@ export default function Apply() {
         <div className="auth-form-wrap" style={{ maxWidth: 460 }}>
           {result ? (
             <div>
-              <div className="badge success" style={{ marginBottom: 16 }}>Application received</div>
-              <div style={{ fontWeight: 800, fontSize: 20, marginBottom: 10 }}>You're almost set.</div>
-              <p style={{ fontSize: 13.5, lineHeight: 1.7, marginBottom: 10, color: "var(--text2)" }}>{result.message}</p>
-              <p style={{ fontSize: 13.5, marginBottom: 26 }}>
-                Reference number: <strong className="mono">{result.referenceId}</strong>
-              </p>
-              <Link to="/login" className="btn btn-primary" style={{ width: "100%", justifyContent: "center" }}>
-                Back to sign-in
+              <div className="badge success" style={{ marginBottom: 14 }}>✓ Application & Website Provisioned</div>
+              <div style={{ fontWeight: 800, fontSize: 20, marginBottom: 8 }}>Registration Received!</div>
+              <p style={{ fontSize: 13.5, lineHeight: 1.6, marginBottom: 14, color: "var(--text2)" }}>{result.message}</p>
+              
+              <div style={{ background: "#f0f9ff", border: "1px solid #bae6fd", borderRadius: 10, padding: 16, marginBottom: 20 }}>
+                <div style={{ fontWeight: 700, color: "#0369a1", fontSize: 14, marginBottom: 4 }}>🌐 Your Default Industry Website is Ready</div>
+                <div style={{ fontSize: 12.5, color: "#0284c7", marginBottom: 12 }}>
+                  Every registered enterprise automatically receives a branded public portal site featuring your products, map location, certificates, and contact details.
+                </div>
+                <div className="mono" style={{ fontSize: 12, background: "#fff", padding: "8px 12px", borderRadius: 6, border: "1px solid #cbd5e1", color: "#0f172a", marginBottom: 12 }}>
+                  Reference ID: <strong>{result.referenceId}</strong><br />
+                  Public Website URL: <strong>/site/{result.slug}</strong>
+                </div>
+                <a href={`/site/${result.slug}`} target="_blank" rel="noreferrer" className="btn btn-primary btn-sm" style={{ textDecoration: "none", width: "100%", justifyContent: "center" }}>
+                  Preview Default Website Template ↗
+                </a>
+              </div>
+
+              <Link to="/login" className="btn btn-outline" style={{ width: "100%", justifyContent: "center" }}>
+                Back to Sign-In
               </Link>
             </div>
           ) : (

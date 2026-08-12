@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { accounts } from "../data/authAccounts.js";
+import { accounts, verifyPassword } from "../data/authAccounts.js";
 import { createSession, destroySession } from "../data/sessions.js";
 import { roles, findRole } from "../data/auth.js";
 import { PERMISSIONS } from "../data/permissions.js";
@@ -8,7 +8,7 @@ import { authenticate, getBearerToken } from "../middleware/auth.js";
 const router = Router();
 
 function toSafeUser(account) {
-  const { password, ...safe } = account;
+  const { passwordHash, ...safe } = account;
   return { ...safe, role: findRole(account.role) };
 }
 
@@ -16,11 +16,12 @@ router.get("/roles", (req, res) => {
   res.json({ roles });
 });
 
+// Never returns passwords — the login page's one-click demo panel uses its
+// own client-side copy of these credentials (see frontend demoAccounts config).
 router.get("/demo-accounts", (req, res) => {
   res.json({
     items: accounts.map((a) => ({
       username: a.username,
-      password: a.password,
       name: a.name,
       role: a.role,
       roleLabel: findRole(a.role).label,
@@ -30,7 +31,7 @@ router.get("/demo-accounts", (req, res) => {
 
 router.post("/login", (req, res, next) => {
   const { username, password } = req.body || {};
-  const account = accounts.find((a) => a.username === username && a.password === password);
+  const account = accounts.find((a) => a.username === username && verifyPassword(password || "", a.passwordHash));
   if (!account) {
     const err = new Error("Invalid username or password");
     err.status = 401;

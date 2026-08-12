@@ -14,6 +14,7 @@ import auditRoutes from "./audit.routes.js";
 import configRoutes from "./config.routes.js";
 import licensesRoutes from "./licenses.routes.js";
 import paymentsRoutes from "./payments.routes.js";
+import chatRoutes from "./chat.routes.js";
 
 const router = Router();
 
@@ -32,5 +33,6 @@ router.use("/audit", auditRoutes);
 router.use("/config", configRoutes);
 router.use("/licenses", licensesRoutes);
 router.use("/payments", paymentsRoutes);
+router.use("/chat", chatRoutes);
 
 export default router;

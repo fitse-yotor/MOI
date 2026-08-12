@@ -54,6 +54,89 @@ let nextTemplateNum = 4;
 let nextLicenseNum = 1;
 let nextPaymentNum = 1;
 
+// --- Seed demo data ---------------------------------------------------------
+// Populated at startup so the Licenses pages, certificate previews and
+// enterprise websites have realistic records on first run.
+const day = (y, m, d) => formatDate(new Date(Date.UTC(y, m - 1, d)));
+
+licenses.push(
+  {
+    id: "LC-SEED-001", licenseNumber: "LIC-2025-00001", enterpriseId: "ENT-1001",
+    enterpriseName: "Bole Lemi Garments PLC", templateId: "TPL-1", templateName: "Manufacturing Operating License",
+    category: "Operating license", feeETB: 5000, status: "Active",
+    issueDate: day(2025, 9, 1), expiryDate: day(2026, 9, 1), issuedBy: "Tsion Bekele",
+    history: [
+      { action: "Application submitted", by: "Aster Kebede", date: day(2025, 8, 20), note: "Manufacturing Operating License application submitted for Bole Lemi Garments PLC" },
+      { action: "Application approved", by: "Tsion Bekele", date: day(2025, 8, 26), note: "" },
+      { action: "Payment confirmed", by: "Bole Lemi Garments PLC", date: day(2025, 8, 28), note: "Paid ETB 5,000 via Telebirr (ref TLB2025082801)" },
+      { action: "Issued", by: "Tsion Bekele", date: day(2025, 9, 1), note: "Manufacturing Operating License issued to Bole Lemi Garments PLC" },
+    ],
+  },
+  {
+    id: "LC-SEED-002", licenseNumber: "LIC-2025-00002", enterpriseId: "ENT-1004",
+    enterpriseName: "Hawassa Leather Products", templateId: "TPL-2", templateName: "Environmental Compliance Certificate",
+    category: "Compliance certificate", feeETB: 3200, status: "Active",
+    issueDate: day(2025, 3, 15), expiryDate: day(2027, 3, 15), issuedBy: "Abrham Girma",
+    history: [
+      { action: "Application submitted", by: "Meron Tadesse", date: day(2025, 3, 1), note: "Environmental Compliance Certificate application submitted for Hawassa Leather Products" },
+      { action: "Application approved", by: "Abrham Girma", date: day(2025, 3, 10), note: "" },
+      { action: "Payment confirmed", by: "Hawassa Leather Products", date: day(2025, 3, 12), note: "Paid ETB 3,200 via Telebirr (ref TLB2025031201)" },
+      { action: "Issued", by: "Abrham Girma", date: day(2025, 3, 15), note: "Environmental Compliance Certificate issued to Hawassa Leather Products" },
+    ],
+  },
+  {
+    id: "LC-SEED-003", licenseNumber: "LIC-2026-00003", enterpriseId: "ENT-1005",
+    enterpriseName: "Bahir Dar Textiles PLC", templateId: "TPL-3", templateName: "Export Permit License",
+    category: "Trade permit", feeETB: 2500, status: "Payment due",
+    issueDate: null, expiryDate: null, issuedBy: null,
+    history: [
+      { action: "Application submitted", by: "Yohannes Alebachew", date: day(2026, 7, 28), note: "Export Permit License application submitted for Bahir Dar Textiles PLC" },
+      { action: "Application approved", by: "Tsion Bekele", date: day(2026, 8, 2), note: "" },
+    ],
+  },
+  {
+    id: "LC-SEED-004", licenseNumber: "LIC-2026-00004", enterpriseId: "ENT-1002",
+    enterpriseName: "Adama Agro Processing", templateId: "TPL-1", templateName: "Manufacturing Operating License",
+    category: "Operating license", feeETB: 5000, status: "Submitted",
+    issueDate: null, expiryDate: null, issuedBy: null,
+    history: [
+      { action: "Application submitted", by: "Dawit Alemu", date: day(2026, 8, 5), note: "Manufacturing Operating License application submitted for Adama Agro Processing" },
+    ],
+  },
+  {
+    id: "LC-SEED-005", licenseNumber: "LIC-2024-00005", enterpriseId: "ENT-1006",
+    enterpriseName: "Dire Dawa Chemical Industries", templateId: "TPL-3", templateName: "Export Permit License",
+    category: "Trade permit", feeETB: 2500, status: "Expired",
+    issueDate: day(2024, 6, 1), expiryDate: day(2025, 6, 1), issuedBy: "Tsion Bekele",
+    history: [
+      { action: "Application submitted", by: "Nuru Ahmed", date: day(2024, 5, 10), note: "Export Permit License application submitted for Dire Dawa Chemical Industries" },
+      { action: "Application approved", by: "Tsion Bekele", date: day(2024, 5, 20), note: "" },
+      { action: "Payment confirmed", by: "Dire Dawa Chemical Industries", date: day(2024, 5, 22), note: "Paid ETB 2,500 via Telebirr (ref TLB2024052201)" },
+      { action: "Issued", by: "Tsion Bekele", date: day(2024, 6, 1), note: "Export Permit License issued to Dire Dawa Chemical Industries" },
+      { action: "Expired", by: "System", date: day(2025, 6, 2), note: "Validity period ended 2025-06-01" },
+    ],
+  },
+);
+
+// Pending Telebirr payment for the "Payment due" seed license above, so the
+// checkout flow is immediately exercisable.
+payments.push({
+  id: "PAY-00001",
+  licenseId: "LC-SEED-003",
+  enterpriseName: "Bahir Dar Textiles PLC",
+  purpose: "issue",
+  amount: 2500,
+  method: "telebirr",
+  status: "Pending",
+  phone: "",
+  telebirrRef: "",
+  createdAt: day(2026, 8, 2),
+  completedAt: null,
+});
+
+nextLicenseNum = 6;
+nextPaymentNum = 2;
+
 // License status machine:
 //   Submitted -> Rejected
 //             -> Payment due -> Payment confirmed -> Active

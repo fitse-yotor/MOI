@@ -1,7 +1,9 @@
 export const LEVELS = ["Woreda", "Zonal", "Regional", "Federal"];
 
 // Which login role is authorized to decide at each review level. Federal
-// administrators can act at any level (escalation / override).
+// administrators can act at any level (escalation / override). The five demo
+// roles intentionally share one officer for both the Zonal and Regional
+// levels — a regional officer decides at both.
 const ROLE_FOR_LEVEL = { Woreda: "woreda", Zonal: "regional", Regional: "regional", Federal: "federal" };
 
 export function canDecideAtLevel(role, level) {

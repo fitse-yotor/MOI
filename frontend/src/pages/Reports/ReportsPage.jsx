@@ -11,15 +11,18 @@ import ConfirmDialog from "../../components/common/ConfirmDialog.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useSnackbar } from "../../context/SnackbarContext.jsx";
 
-const CATEGORIES = ["Employment", "Production", "Trade", "Investment", "Registry", "Benchmark", "Data quality"];
+const CATEGORIES = ["Employment", "Production", "Trade", "Investment", "Registry", "Benchmark", "Data quality", "Compliance", "Policy Brief", "Administrative"];
 
 export default function ReportsPage() {
   const { can } = useAuth();
   const navigate = useNavigate();
   const { notify } = useSnackbar();
+
+  const [activeType, setActiveType] = useState("all");
   const [filters, setFilters] = useState({ q: "", category: "all" });
   const [deleting, setDeleting] = useState(null);
-  const query = buildQuery(filters);
+
+  const query = buildQuery({ ...filters, type: activeType });
   const { data, loading, error, refetch } = useApiGet(`/reports${query}`, { deps: [query] });
   const del = useApiAction("del");
 
@@ -30,12 +33,43 @@ export default function ReportsPage() {
     refetch();
   }
 
+  const items = data?.items || [];
+  const statCount = items.filter((r) => r.type === "statistical").length;
+  const nonStatCount = items.filter((r) => r.type === "non_statistical").length;
+
   const columns = [
-    { key: "name", label: "Report", render: (r) => <span className="tag-name">{r.name}</span> },
-    { key: "category", label: "Category", render: (r) => <Badge tone="info">{r.category}</Badge> },
-    { key: "period", label: "Period" },
-    { key: "published", label: "Last published" },
-    { key: "status", label: "Status", render: (r) => <Badge>{r.status}</Badge> },
+    {
+      key: "name",
+      label: "Report Title",
+      render: (r) => (
+        <div>
+          <div className="tag-name" style={{ fontWeight: 700, color: "var(--primary-dark)" }}>{r.name}</div>
+          {r.author && <div style={{ fontSize: 11, color: "var(--text2)" }}>{r.author}</div>}
+        </div>
+      ),
+    },
+    {
+      key: "type",
+      label: "Reporting Classification",
+      render: (r) =>
+        r.type === "statistical" ? (
+          <Badge tone="info">Statistical</Badge>
+        ) : (
+          <Badge tone="warn">Non-Statistical</Badge>
+        ),
+    },
+    { key: "category", label: "Category", render: (r) => <Badge tone="muted">{r.category}</Badge> },
+    { key: "period", label: "Period", render: (r) => <span className="mono" style={{ fontSize: 12 }}>{r.period || "—"}</span> },
+    { key: "published", label: "Published", render: (r) => <span style={{ fontSize: 12 }}>{r.published}</span> },
+    {
+      key: "status",
+      label: "Status",
+      render: (r) => (
+        <Badge tone={r.status === "Published" ? "success" : r.status === "In review" ? "warn" : "muted"}>
+          {r.status}
+        </Badge>
+      ),
+    },
     {
       key: "actions",
       label: "",
@@ -50,21 +84,68 @@ export default function ReportsPage() {
   ];
 
   return (
-    <>
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+      {/* ── Type Selector Tabs ── */}
+      <div style={{ display: "flex", gap: 8, borderBottom: "1px solid var(--border)", paddingBottom: 10, flexWrap: "wrap", alignItems: "center" }}>
+        {[
+          { id: "all", label: "All Catalogue Reports", count: items.length },
+          { id: "statistical", label: "Statistical Reports", count: statCount },
+          { id: "non_statistical", label: "Non-Statistical Reports", count: nonStatCount },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setActiveType(tab.id)}
+            style={{
+              background: activeType === tab.id ? "var(--primary-dark)" : "var(--card)",
+              color: activeType === tab.id ? "#fff" : "var(--text)",
+              border: `1px solid ${activeType === tab.id ? "var(--primary-dark)" : "var(--border)"}`,
+              borderRadius: "var(--radius)",
+              padding: "7px 14px",
+              fontSize: 12.5,
+              fontWeight: 700,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              boxShadow: activeType === tab.id ? "var(--shadow-xs)" : "none",
+              transition: "all 0.15s ease",
+            }}
+          >
+            <span>{tab.label}</span>
+            <span style={{
+              background: activeType === tab.id ? "rgba(255,255,255,0.2)" : "var(--bg)",
+              color: activeType === tab.id ? "#fff" : "var(--text2)",
+              padding: "1px 7px",
+              borderRadius: 20,
+              fontSize: 11,
+              fontFamily: "IBM Plex Mono, monospace",
+            }}>
+              {tab.count}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* ── Search & Filter Controls ── */}
       <FilterBar
         filters={[
-          { type: "search", key: "q", placeholder: "Search report catalogue" },
-          { type: "select", key: "category", label: "categories", options: CATEGORIES },
+          { type: "search", key: "q", placeholder: "Search report catalogue by title or category..." },
+          { type: "select", key: "category", label: "category", options: CATEGORIES },
         ]}
         values={filters}
         onChange={(key, value) => setFilters((f) => ({ ...f, [key]: value }))}
-        actions={can("reports", "create") && <Button size="sm" onClick={() => navigate("/reports/new")}>+ New report</Button>}
+        actions={can("reports", "create") && <Button size="sm" onClick={() => navigate("/reports/new")}>+ New Report</Button>}
       />
+
+      {/* ── Data Table ── */}
       <Card noPadding>
-        <DataState loading={loading} error={error} onRetry={refetch} isEmpty={data && data.items.length === 0}>
-          {data && <DataTable columns={columns} rows={data.items} onRowClick={(r) => navigate(`/reports/${r.id}`)} />}
+        <DataState loading={loading} error={error} onRetry={refetch} isEmpty={data && items.length === 0}>
+          {data && <DataTable columns={columns} rows={items} onRowClick={(r) => navigate(`/reports/${r.id}`)} />}
         </DataState>
       </Card>
+
       <ConfirmDialog
         open={!!deleting}
         title={deleting ? `Delete ${deleting.name}?` : ""}
@@ -72,6 +153,6 @@ export default function ReportsPage() {
         onConfirm={handleDelete}
         onCancel={() => setDeleting(null)}
       />
-    </>
+    </div>
   );
 }

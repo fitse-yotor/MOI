@@ -56,6 +56,9 @@ export default function EnterprisesPage() {
       render: (r) => (
         <div style={{ display: "flex", gap: 6 }}>
           <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/enterprises/${r.id}`); }}>View</Button>
+          {can("enterprises", "view") && r.slug && (
+            <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/site/${r.slug}`); }}>Website</Button>
+          )}
           {can("enterprises", "edit") && (
             <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/enterprises/${r.id}/edit`); }}>Edit</Button>
           )}

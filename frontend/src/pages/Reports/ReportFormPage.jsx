@@ -4,11 +4,19 @@ import { useApiGet, useApiAction } from "../../api/hooks.js";
 import EntityFormPage from "../../components/common/EntityFormPage.jsx";
 import { useSnackbar } from "../../context/SnackbarContext.jsx";
 
-const CATEGORIES = ["Employment", "Production", "Trade", "Investment", "Registry", "Benchmark", "Data quality"];
+const CATEGORIES = ["Employment", "Production", "Trade", "Investment", "Registry", "Benchmark", "Data quality", "Compliance", "Policy Brief", "Administrative"];
+
+const TYPES = [
+  { value: "statistical", label: "Statistical Report" },
+  { value: "non_statistical", label: "Non-Statistical Report" },
+];
+
 const FIELDS = [
-  { key: "name", label: "Report name", required: true },
+  { key: "name", label: "Report Title", required: true },
+  { key: "type", label: "Reporting Type", type: "select", options: TYPES },
   { key: "category", label: "Category", type: "select", options: CATEGORIES },
-  { key: "period", label: "Period" },
+  { key: "period", label: "Period (e.g. Q2 2026)" },
+  { key: "author", label: "Authoring Unit / Department" },
   { key: "status", label: "Status", type: "select", options: ["Draft", "In review", "Published"] },
 ];
 
@@ -24,7 +32,7 @@ export default function ReportFormPage() {
 
   const initialValues = useMemo(() => {
     if (isEdit) return item || {};
-    return { category: CATEGORIES[0], status: "Draft" };
+    return { type: "statistical", category: CATEGORIES[0], status: "Draft" };
   }, [isEdit, item]);
 
   async function handleSubmit(values) {
@@ -41,8 +49,8 @@ export default function ReportFormPage() {
 
   return (
     <EntityFormPage
-      title={isEdit ? `Edit ${item?.name || ""}` : "New report"}
-      subtitle={isEdit ? "Update report metadata" : "Define a new report catalogue entry"}
+      title={isEdit ? `Edit ${item?.name || ""}` : "New Report"}
+      subtitle={isEdit ? "Update report metadata and classification" : "Define a new report catalogue entry"}
       backTo="/reports"
       fields={FIELDS}
       initialValues={initialValues}

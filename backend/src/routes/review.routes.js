@@ -9,13 +9,22 @@ function scopeToOwnEnterprise(items, user) {
   return user.role === "enterprise" ? items.filter((s) => s.enterprise === user.enterpriseName) : items;
 }
 
+// A reviewer should only see submissions they are allowed to act on: their own
+// enterprise's records (enterprise role) or records currently sitting at a
+// level their role can decide (woreda/regional/federal).
+function queueScoped(items, user) {
+  const own = scopeToOwnEnterprise(items, user);
+  if (user.role === "enterprise") return own;
+  return own.filter((s) => canDecideAtLevel(user.role, s.level));
+}
+
 router.get("/queue", authorize("review", "view"), (req, res) => {
-  const items = scopeToOwnEnterprise(submissions.filter((s) => s.status === "Pending"), req.user);
+  const items = queueScoped(submissions.filter((s) => s.status === "Pending"), req.user);
   res.json({ items });
 });
 
 router.get("/returned", authorize("review", "view"), (req, res) => {
-  const items = scopeToOwnEnterprise(submissions.filter((s) => s.status === "Returned"), req.user);
+  const items = queueScoped(submissions.filter((s) => s.status === "Returned"), req.user);
   res.json({ items });
 });
 

@@ -26,8 +26,9 @@ export default function ReportViewPage() {
 
   const fields = r
     ? [
-        { label: "Period", value: r.period },
-        { label: "Last published", value: r.published },
+        { label: "Authoring Unit", value: r.author || "Ministry Directorate" },
+        { label: "Period", value: r.period || "—" },
+        { label: "Last published", value: r.published || "—" },
       ]
     : [];
 
@@ -44,14 +45,17 @@ export default function ReportViewPage() {
         badges={
           r && (
             <>
-              <Badge tone="info">{r.category}</Badge>
-              <Badge>{r.status}</Badge>
+              <Badge tone={r.type === "statistical" ? "info" : "warn"}>
+                {r.type === "statistical" ? "📊 Statistical" : "📝 Non-Statistical"}
+              </Badge>
+              <Badge tone="muted">{r.category}</Badge>
+              <Badge tone={r.status === "Published" ? "success" : "muted"}>{r.status}</Badge>
             </>
           )
         }
         actions={
           <>
-            <Button variant="outline" size="sm">Download PDF</Button>
+            <Button variant="outline" size="sm" onClick={() => notify("Downloading official report PDF...", "info")}>Download PDF</Button>
             {can("reports", "edit") && (
               <Button variant="outline" size="sm" onClick={() => navigate(`/reports/${id}/edit`)}>Edit</Button>
             )}
