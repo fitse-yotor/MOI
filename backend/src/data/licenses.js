@@ -54,11 +54,32 @@ let nextTemplateNum = 4;
 let nextLicenseNum = 1;
 let nextPaymentNum = 1;
 
+// License status machine:
+//   Submitted -> Rejected
+//             -> Payment due -> Payment confirmed -> Active
+//   Active -> Renewal submitted -> (rejected, back to Active)
+//                                -> Renewal payment due -> Renewal payment confirmed -> Active (extended)
+//   Active -> Expired (derived when past expiryDate; see syncExpiry)
+//   Active/Expired -> Closed / Revoked
+export const STATUSES = [
+  "Submitted",
+  "Rejected",
+  "Payment due",
+  "Payment confirmed",
+  "Active",
+  "Renewal submitted",
+  "Renewal payment due",
+  "Renewal payment confirmed",
+  "Expired",
+  "Closed",
+  "Revoked",
+];
+
 export function formatDate(date) {
   return date.toISOString().slice(0, 10);
 }
 
-function addMonths(dateStr, months) {
+export function addMonths(dateStr, months) {
   const d = new Date(dateStr);
   d.setMonth(d.getMonth() + months);
   return formatDate(d);
@@ -93,7 +114,7 @@ export function createTemplate(body = {}) {
   return item;
 }
 
-function createPayment({ licenseId, enterpriseName, purpose, amount }) {
+export function createPayment({ licenseId, enterpriseName, purpose, amount }) {
   const payment = {
     id: `PAY-${String(nextPaymentNum++).padStart(5, "0")}`,
     licenseId,
@@ -112,14 +133,13 @@ function createPayment({ licenseId, enterpriseName, purpose, amount }) {
 }
 
 /**
- * Issues a new license to an enterprise from a template. Free templates
- * (feeETB === 0) activate immediately; paid ones open in "Pending payment"
- * with a linked Telebirr payment row for the enterprise to settle.
+ * Submits a license application — either an enterprise applying for itself,
+ * or an officer applying on an enterprise's behalf. Always starts as
+ * "Submitted"; nothing is issued or charged until an institution reviews it.
  */
-export function createLicense({ enterprise, template, issuedBy }) {
+export function submitApplication({ enterprise, template, by }) {
   const year = new Date().getFullYear();
   const licenseNumber = `LIC-${year}-${String(nextLicenseNum++).padStart(5, "0")}`;
-  const requiresPayment = template.feeETB > 0;
   const item = {
     id: `LC-${Date.now().toString(36).toUpperCase()}`,
     licenseNumber,
@@ -129,26 +149,31 @@ export function createLicense({ enterprise, template, issuedBy }) {
     templateName: template.name,
     category: template.category,
     feeETB: template.feeETB,
-    status: requiresPayment ? "Pending payment" : "Active",
-    issueDate: requiresPayment ? null : formatDate(new Date()),
-    expiryDate: requiresPayment ? null : addMonths(formatDate(new Date()), template.validityMonths),
-    issuedBy,
+    status: "Submitted",
+    issueDate: null,
+    expiryDate: null,
+    issuedBy: null,
     history: [
-      { action: "Issued", by: issuedBy, date: formatDate(new Date()), note: `${template.name} issued to ${enterprise.name}` },
+      { action: "Application submitted", by, date: formatDate(new Date()), note: `${template.name} application submitted for ${enterprise.name}` },
     ],
   };
   licenses.push(item);
-
-  let payment = null;
-  if (requiresPayment) {
-    payment = createPayment({
-      licenseId: item.id,
-      enterpriseName: enterprise.name,
-      purpose: "issue",
-      amount: template.feeETB,
-    });
-  }
-  return { license: item, payment };
+  return item;
 }
 
-export { addMonths, createPayment };
+/** Finds a currently-open (Pending) payment for a license, if any. */
+export function findPendingPayment(licenseId) {
+  return payments.find((p) => p.licenseId === licenseId && p.status === "Pending");
+}
+
+/** Licenses expiring within `withinDays` days, still Active. Used for reminders. */
+export function getExpiringLicenses(withinDays = 30) {
+  const today = new Date();
+  const cutoff = new Date(today);
+  cutoff.setDate(cutoff.getDate() + withinDays);
+  return licenses.filter((l) => {
+    if (l.status !== "Active" || !l.expiryDate) return false;
+    const expiry = new Date(l.expiryDate);
+    return expiry >= today && expiry <= cutoff;
+  });
+}

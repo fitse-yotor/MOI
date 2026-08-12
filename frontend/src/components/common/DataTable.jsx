@@ -17,7 +17,7 @@ export default function DataTable({ columns, rows, rowKey = "id", onRowClick }) 
               style={onRowClick ? { cursor: "pointer" } : undefined}
             >
               {columns.map((c) => (
-                <td key={c.key}>{c.render ? c.render(row) : row[c.key]}</td>
+                <td key={c.key} data-label={c.label || undefined}>{c.render ? c.render(row) : row[c.key]}</td>
               ))}
             </tr>
           ))}

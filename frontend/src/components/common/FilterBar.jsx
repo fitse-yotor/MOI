@@ -5,7 +5,7 @@ export default function FilterBar({ filters = [], values = {}, onChange, actions
     <div className="toolbar">
       {filters.map((f) =>
         f.type === "search" ? (
-          <div className="search-box" style={{ width: 260 }} key={f.key}>
+          <div className="search-box" key={f.key}>
             <NavIcon name="search" size={14} />
             <input
               placeholder={f.placeholder}
@@ -27,7 +27,7 @@ export default function FilterBar({ filters = [], values = {}, onChange, actions
           </select>
         )
       )}
-      {actions && <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>{actions}</div>}
+      {actions && <div className="toolbar-actions">{actions}</div>}
     </div>
   );
 }

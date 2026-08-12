@@ -29,9 +29,16 @@ async function request(path, options = {}) {
   return body;
 }
 
+// Express's json() body-parser runs in strict mode, which rejects a body
+// that's valid JSON but not an object/array (e.g. the literal "null") — so
+// omit the body entirely for actions with no payload, rather than sending it.
+function body(data) {
+  return data == null ? undefined : JSON.stringify(data);
+}
+
 export const api = {
   get: (path) => request(path),
-  post: (path, data) => request(path, { method: "POST", body: JSON.stringify(data) }),
-  put: (path, data) => request(path, { method: "PUT", body: JSON.stringify(data) }),
+  post: (path, data) => request(path, { method: "POST", body: body(data) }),
+  put: (path, data) => request(path, { method: "PUT", body: body(data) }),
   del: (path) => request(path, { method: "DELETE" }),
 };
