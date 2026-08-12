@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApiGet, useApiAction } from "../../api/hooks.js";
+import { useAuth } from "../../context/AuthContext.jsx";
 import { Card, CardHead } from "../../components/common/Card.jsx";
 import { DataState } from "../../components/common/StateViews.jsx";
 import Button from "../../components/common/Button.jsx";
@@ -8,9 +9,11 @@ import CertificatePreview from "../../components/common/CertificatePreview.jsx";
 
 export default function LicenseIssuePage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isEnterprise = user?.role?.id === "enterprise";
   const { data: entData, loading: entLoading, error: entError } = useApiGet("/enterprises");
   const { data: tplData, loading: tplLoading, error: tplError } = useApiGet("/licenses/templates");
-  const issue = useApiAction("post");
+  const submit = useApiAction("post");
   const [enterpriseId, setEnterpriseId] = useState("");
   const [templateId, setTemplateId] = useState("");
   const [error, setError] = useState("");
@@ -32,10 +35,10 @@ export default function LicenseIssuePage() {
     e.preventDefault();
     setError("");
     try {
-      const res = await issue.run("/licenses", { enterpriseId, templateId });
+      const res = await submit.run("/licenses", { enterpriseId, templateId });
       navigate(`/licenses/${res.item.id}`);
     } catch (err) {
-      setError(err.message || "Could not issue license");
+      setError(err.message || "Could not submit application");
     }
   }
 
@@ -44,17 +47,22 @@ export default function LicenseIssuePage() {
       <button className="link-btn" onClick={() => navigate("/licenses")} style={{ marginBottom: 14 }}>← Back</button>
       <div className="grid g2" style={{ alignItems: "start" }}>
         <Card>
-          <CardHead title="Issue a License" subtitle="Select the enterprise and license template to issue" />
+          <CardHead
+            title={isEnterprise ? "Apply for a License" : "New License Application"}
+            subtitle={isEnterprise ? "Choose the license or certificate you want to apply for" : "Submit a license application on behalf of an enterprise"}
+          />
           <DataState loading={entLoading || tplLoading} error={entError || tplError}>
             <form onSubmit={handleSubmit}>
-              <div className="form-field" style={{ marginBottom: 16 }}>
-                <label>Enterprise</label>
-                <select value={enterpriseId} onChange={(e) => setEnterpriseId(e.target.value)}>
-                  {enterprises.map((en) => (
-                    <option key={en.id} value={en.id}>{en.name} · {en.tin}</option>
-                  ))}
-                </select>
-              </div>
+              {!isEnterprise && (
+                <div className="form-field" style={{ marginBottom: 16 }}>
+                  <label>Enterprise</label>
+                  <select value={enterpriseId} onChange={(e) => setEnterpriseId(e.target.value)}>
+                    {enterprises.map((en) => (
+                      <option key={en.id} value={en.id}>{en.name} · {en.tin}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div className="form-field" style={{ marginBottom: 16 }}>
                 <label>License template</label>
                 <select value={templateId} onChange={(e) => setTemplateId(e.target.value)}>
@@ -75,16 +83,14 @@ export default function LicenseIssuePage() {
                   </div>
                 </div>
               )}
-              {template?.feeETB > 0 && (
-                <div className="hint-banner">
-                  This license requires payment before it becomes active. The enterprise will be prompted to pay ETB {template.feeETB.toLocaleString()} via Telebirr.
-                </div>
-              )}
+              <div className="hint-banner">
+                Your application will be reviewed by the Ministry before {template?.feeETB > 0 ? "payment is requested" : "the license is issued"}. You'll be notified of the decision.
+              </div>
               {error && <div className="badge error" style={{ marginBottom: 14 }}>{error}</div>}
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 10, paddingTop: 20, borderTop: "1px solid var(--border)" }}>
                 <Button variant="outline" type="button" onClick={() => navigate("/licenses")}>Cancel</Button>
-                <Button type="submit" disabled={issue.pending || !enterprise || !template}>
-                  {issue.pending ? "Issuing…" : "Issue license"}
+                <Button type="submit" disabled={submit.pending || !enterprise || !template}>
+                  {submit.pending ? "Submitting…" : "Submit application"}
                 </Button>
               </div>
             </form>
@@ -98,7 +104,7 @@ export default function LicenseIssuePage() {
             enterpriseName={enterprise?.name}
             feeETB={template.feeETB}
             terms={template.terms}
-            status={template.feeETB > 0 ? "Pending payment" : "Active"}
+            status="Submitted"
           />
         )}
       </div>
