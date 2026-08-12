@@ -14,7 +14,7 @@ function resolveMeta(pathname) {
   return PAGE_META[match] || PAGE_META["/"];
 }
 
-export default function Topbar() {
+export default function Topbar({ onMenuClick }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -28,6 +28,9 @@ export default function Topbar() {
   return (
     <div className="topbar">
       <div className="topbar-left">
+        <button className="icon-btn menu-btn" onClick={onMenuClick} aria-label="Open menu">
+          <NavIcon name="menu" size={18} />
+        </button>
         <div>
           <div className="page-title">{title}</div>
           <div className="page-sub">{subtitle}</div>

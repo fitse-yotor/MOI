@@ -32,11 +32,12 @@ export default function EntityFormPage({ title, subtitle, backTo, fields, initia
   }
 
   return (
-    <div style={{ maxWidth: 800, margin: "0 auto" }}>
+    <div style={{ maxWidth: 1040, margin: "0 auto" }}>
       <button className="link-btn" onClick={() => navigate(backTo)} style={{ marginBottom: 14 }}>← Back</button>
       <Card>
-        <div className="card-title" style={{ fontSize: 16 }}>{title}</div>
-        {subtitle && <div className="muted" style={{ fontSize: 12.5, marginTop: 3, marginBottom: 22 }}>{subtitle}</div>}
+        <div className="card-title" style={{ fontSize: 17 }}>{title}</div>
+        {subtitle && <div className="muted" style={{ fontSize: 12.5, marginTop: 4 }}>{subtitle}</div>}
+        <div className="entity-divider" />
         <DataState loading={loading} error={loadError}>
           <form onSubmit={handleSubmit}>
             <div className="form-grid">

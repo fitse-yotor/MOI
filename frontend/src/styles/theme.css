@@ -98,11 +98,38 @@ tbody tr:last-child td { border-bottom: none; }
 .table-wrap table { border: none; }
 .table-wrap .card-head { padding: 18px 20px 4px; }
 
+/* Below 720px, rows become label/value cards instead of a horizontally
+   scrolling table — same data, no per-page changes needed. */
+@media (max-width: 720px) {
+  .table-wrap table, .table-wrap thead, .table-wrap tbody, .table-wrap th, .table-wrap tr { display: block; }
+  .table-wrap thead { display: none; }
+  .table-wrap tbody tr { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .table-wrap tbody tr:hover { background: none; }
+  .table-wrap tbody tr:active { background: #f8fafb; }
+  .table-wrap td { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 7px 0; border-bottom: none; text-align: right; }
+  .table-wrap td[data-label]::before { content: attr(data-label); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text2); text-align: left; flex-shrink: 0; }
+  .table-wrap td:not([data-label]), .table-wrap td[data-label=""] { justify-content: flex-end; }
+  .table-wrap td:not([data-label])::before, .table-wrap td[data-label=""]::before { content: none; }
+  /* The first column is each row's identifying name/title — give it a
+     full-width header treatment instead of a cramped label:value row. */
+  .table-wrap tbody td:first-child { display: block; text-align: left; padding: 0 0 10px; margin-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .table-wrap tbody td:first-child::before { content: none; }
+}
+
 .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+.toolbar .search-box { flex: 1 1 240px; max-width: 320px; }
+.toolbar-actions { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
 .filter-select, .filter-input { border: 1px solid var(--border); background: #fff; border-radius: 9px; padding: 8.5px 13px; font-size: 12.5px; font-family: inherit; color: var(--text); outline: none; transition: border-color 0.15s; }
 .filter-select:focus, .filter-input:focus { border-color: var(--primary); }
 .tag-name { font-weight: 600; }
 .tag-sub { color: var(--text2); font-size: 11.5px; margin-top: 2px; }
+@media (max-width: 640px) {
+  .toolbar { gap: 8px; }
+  .toolbar .search-box { flex-basis: 100%; max-width: none; }
+  .toolbar .filter-select { flex: 1 1 140px; }
+  .toolbar-actions { margin-left: 0; flex-basis: 100%; }
+  .toolbar-actions > * { flex: 1; }
+}
 
 .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
 .tab { padding: 10px 16px; font-size: 12.8px; font-weight: 600; color: var(--text2); border-bottom: 2px solid transparent; cursor: pointer; background: none; border-top: none; border-left: none; border-right: none; transition: color 0.15s; }
@@ -124,7 +151,9 @@ tbody tr:last-child td { border-bottom: none; }
 .opp-card h4 { font-size: 14px; margin: 6px 0 4px; }
 .opp-card p { font-size: 12.5px; color: var(--text2); line-height: 1.5; }
 .opp-meta { display: flex; gap: 14px; margin-top: 12px; font-size: 11.5px; color: var(--text2); }
-.avatar-sm { width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 10.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.avatar-sm { width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 10.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.entity-avatar { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); font-size: 15px; box-shadow: var(--shadow-sm); }
+.entity-divider { height: 1px; background: var(--border); margin: 22px 0 20px; }
 
 .hint-banner { display: flex; gap: 12px; align-items: flex-start; background: var(--secondary-light); border: 1px solid #bfe6e8; border-radius: var(--radius); padding: 14px 16px; margin-bottom: 20px; font-size: 12.5px; line-height: 1.6; color: #0b5560; }
 
@@ -138,17 +167,21 @@ tbody tr:last-child td { border-bottom: none; }
 .step:not(:last-child)::after { content: ""; position: absolute; left: 36px; right: -20px; top: 13px; height: 2px; background: var(--border); }
 .step.done:not(:last-child)::after { background: var(--success); }
 
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px 20px; }
 .form-field label { font-size: 11.5px; font-weight: 700; color: var(--text2); display: block; margin-bottom: 6px; }
-.form-field input, .form-field select { width: 100%; padding: 9.5px 13px; border: 1px solid var(--border); border-radius: 9px; font-family: inherit; font-size: 13px; outline: none; background: #fff; transition: border-color 0.15s, box-shadow 0.15s; }
-.form-field input:focus, .form-field select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(7, 89, 133, 0.1); }
+.form-field input, .form-field select, .form-field textarea { width: 100%; padding: 9.5px 13px; border: 1px solid var(--border); border-radius: 9px; font-family: inherit; font-size: 13px; outline: none; background: #fff; transition: border-color 0.15s, box-shadow 0.15s; }
+.form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(7, 89, 133, 0.1); }
 
 .chart-box { position: relative; height: 260px; }
 .chart-box.tall { height: 320px; }
 
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-.field label { font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.03em; display: block; margin-bottom: 5px; }
-.field .fval { font-size: 13.5px; font-weight: 500; padding: 9px 0; border-bottom: 1px dashed var(--border); }
+/* View-page field tiles — soft, self-contained blocks rather than a plain
+   dashed-underline list, and they reflow to fill available width instead
+   of a fixed 2-column grid. */
+.field-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 12px; }
+.field { background: var(--bg); border-radius: 10px; padding: 12px 14px; }
+.field label { font-size: 10px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.04em; display: block; margin-bottom: 5px; }
+.field .fval { font-size: 13.5px; font-weight: 600; color: var(--text); line-height: 1.4; word-break: break-word; }
 
 /* Certificate — issued license / template live-preview */
 .certificate { background: var(--card); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); padding: 7px; }
@@ -163,7 +196,7 @@ tbody tr:last-child td { border-bottom: none; }
 .certificate-body { text-align: center; padding: 16px 0 22px; border-top: 1px dashed var(--border); border-bottom: 1px dashed var(--border); margin-bottom: 22px; }
 .certificate-lede { font-size: 12px; color: var(--text2); }
 .certificate-name { font-size: 25px; font-weight: 800; color: var(--primary-dark); margin: 8px 0; letter-spacing: -0.01em; }
-.certificate-meta { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px 22px; margin-bottom: 20px; }
+.certificate-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px 22px; margin-bottom: 20px; }
 .certificate-meta label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text2); font-weight: 700; display: block; margin-bottom: 4px; }
 .certificate-meta > div > div:last-child { font-size: 13.5px; font-weight: 600; }
 .certificate-terms label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text2); font-weight: 700; display: block; margin-bottom: 8px; }
