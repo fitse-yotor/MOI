@@ -9,10 +9,15 @@ import { Card, CardHead } from "../../components/common/Card.jsx";
 import { DataState } from "../../components/common/StateViews.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 
-const STATUSES = ["Pending payment", "Active", "Renewal pending payment", "Expired", "Closed", "Revoked"];
+const STATUSES = [
+  "Submitted", "Rejected", "Payment due", "Payment confirmed", "Active",
+  "Renewal submitted", "Renewal payment due", "Renewal payment confirmed",
+  "Expired", "Closed", "Revoked",
+];
 
 export default function LicensesPage() {
-  const { can } = useAuth();
+  const { can, user } = useAuth();
+  const isEnterprise = user?.role?.id === "enterprise";
   const navigate = useNavigate();
   const [filters, setFilters] = useState({ q: "", status: "all", category: "all" });
   const query = buildQuery(filters);
@@ -59,7 +64,13 @@ export default function LicensesPage() {
         ]}
         values={filters}
         onChange={(key, value) => setFilters((f) => ({ ...f, [key]: value }))}
-        actions={can("licenses", "create") && <Button size="sm" onClick={() => navigate("/licenses/issue")}>Issue license</Button>}
+        actions={
+          (isEnterprise || can("licenses", "create")) && (
+            <Button size="sm" onClick={() => navigate("/licenses/issue")}>
+              {isEnterprise ? "Apply for a license" : "New application"}
+            </Button>
+          )
+        }
       />
       <Card noPadding>
         <div style={{ padding: "16px 18px 0" }}>

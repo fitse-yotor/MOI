@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manufacturing Business Information System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.3/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+:root{
+  --primary:#075985; --primary-dark:#12344D; --secondary:#087F8C; --secondary-light:#DDF3F4;
+  --accent:#F4B41A; --accent-dark:#C88A00; --success:#27864B; --error:#C93C37; --info:#1976B9;
+  --bg:#F5F7F9; --card:#FFFFFF; --border:#D7E0E7; --text:#263746; --text2:#667785;
+  --radius:10px; --sidebar-w:252px;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--text); font-size:14px; -webkit-font-smoothing:antialiased;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+a{text-decoration:none; color:inherit;}
+button{font-family:inherit; cursor:pointer;}
+::-webkit-scrollbar{width:8px; height:8px;}
+::-webkit-scrollbar-thumb{background:var(--border); border-radius:8px;}
+
+/* ===== APP SHELL ===== */
+.app{display:flex; min-height:100vh;}
+.sidebar{
+  width:var(--sidebar-w); flex-shrink:0; background:var(--primary-dark); color:#fff;
+  position:fixed; top:0; left:0; bottom:0; display:flex; flex-direction:column; z-index:50;
+}
+.sidebar-brand{display:flex; align-items:center; gap:10px; padding:20px 20px 16px; border-bottom:1px solid rgba(255,255,255,.08);}
+.sidebar-brand .mark{width:34px; height:34px; border-radius:8px; background:linear-gradient(135deg,var(--accent),var(--accent-dark)); display:flex; align-items:center; justify-content:center; font-weight:800; color:var(--primary-dark); font-size:15px;}
+.sidebar-brand .name{font-weight:700; font-size:13.5px; line-height:1.25;}
+.sidebar-brand .name span{display:block; font-weight:500; font-size:10.5px; color:#9FB6C6; letter-spacing:.04em; text-transform:uppercase;}
+.nav-scroll{flex:1; overflow-y:auto; padding:14px 10px 20px;}
+.nav-group{margin-bottom:6px;}
+.nav-group-label{font-size:10px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:#7C97AA; padding:14px 12px 6px;}
+.nav-item{display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:8px; color:#CBDCE6; font-size:13.2px; font-weight:500; position:relative; cursor:pointer; transition:background .15s;}
+.nav-item svg{width:17px; height:17px; flex-shrink:0; opacity:.85;}
+.nav-item:hover{background:rgba(255,255,255,.06); color:#fff;}
+.nav-item.active{background:var(--primary); color:#fff;}
+.nav-item.active::before{content:''; position:absolute; left:-10px; top:8px; bottom:8px; width:3px; background:var(--accent); border-radius:3px;}
+.nav-item .badge{margin-left:auto; background:var(--accent); color:var(--primary-dark); font-size:10px; font-weight:800; padding:1px 6px; border-radius:20px;}
+.sidebar-foot{padding:14px 16px 18px; border-top:1px solid rgba(255,255,255,.08); font-size:11px; color:#7C97AA;}
+
+.main{margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; min-width:0;}
+.topbar{height:64px; background:#fff; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 26px; position:sticky; top:0; z-index:40;}
+.topbar-left{display:flex; align-items:center; gap:14px;}
+.page-title{font-size:17px; font-weight:700;}
+.page-sub{font-size:12px; color:var(--text2); margin-top:1px;}
+.search-box{display:flex; align-items:center; gap:8px; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:7px 12px; width:280px; color:var(--text2);}
+.search-box input{border:none; background:none; outline:none; font-size:13px; width:100%; color:var(--text); font-family:inherit;}
+.topbar-right{display:flex; align-items:center; gap:16px;}
+.icon-btn{position:relative; width:36px; height:36px; border-radius:8px; border:1px solid var(--border); background:#fff; display:flex; align-items:center; justify-content:center;}
+.icon-btn svg{width:17px; height:17px; color:var(--text2);}
+.icon-btn .dot{position:absolute; top:6px; right:6px; width:7px; height:7px; border-radius:50%; background:var(--error); border:1.5px solid #fff;}
+.role-switch{display:flex; align-items:center; gap:8px; border:1px solid var(--border); border-radius:8px; padding:5px 10px; background:#fff;}
+.role-switch select{border:none; background:none; font-family:inherit; font-size:12.5px; font-weight:600; color:var(--text); outline:none;}
+.user-chip{display:flex; align-items:center; gap:9px; padding-left:14px; border-left:1px solid var(--border);}
+.avatar{width:32px; height:32px; border-radius:50%; background:var(--secondary); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12.5px;}
+.user-chip .u-name{font-size:12.5px; font-weight:600;}
+.user-chip .u-role{font-size:10.5px; color:var(--text2);}
+
+.content{padding:24px 26px 60px;}
+.page{display:none;}
+.page.active{display:block; animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
+
+/* ===== COMMON COMPONENTS ===== */
+.grid{display:grid; gap:18px;}
+.g4{grid-template-columns:repeat(4,1fr);}
+.g3{grid-template-columns:repeat(3,1fr);}
+.g2{grid-template-columns:repeat(2,1fr);}
+@media(max-width:1200px){.g4{grid-template-columns:repeat(2,1fr);} .g3{grid-template-columns:repeat(2,1fr);}}
+
+.card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px;}
+.card-head{display:flex; align-items:center; justify-content:between; justify-content:space-between; margin-bottom:14px;}
+.card-title{font-size:13.5px; font-weight:700;}
+.card-title small{display:block; font-weight:500; color:var(--text2); font-size:11px; margin-top:2px;}
+.link-btn{font-size:12px; font-weight:600; color:var(--secondary);}
+
+.kpi{padding:18px 20px; position:relative; overflow:hidden;}
+.kpi .label{font-size:11.5px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:.03em;}
+.kpi .value{font-family:'IBM Plex Mono',monospace; font-size:28px; font-weight:700; margin-top:8px; color:var(--primary-dark);}
+.kpi .delta{font-size:11.5px; font-weight:600; margin-top:8px; display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:20px;}
+.delta.up{color:var(--success); background:#E7F4EC;}
+.delta.down{color:var(--error); background:#FBEAE9;}
+.kpi .accent-bar{position:absolute; left:0; top:0; bottom:0; width:4px;}
+
+.btn{display:inline-flex; align-items:center; gap:7px; border-radius:8px; font-size:12.5px; font-weight:600; padding:9px 16px; border:1px solid transparent;}
+.btn-primary{background:var(--primary); color:#fff;}
+.btn-primary:hover{background:#064a70;}
+.btn-outline{background:#fff; border-color:var(--border); color:var(--text);}
+.btn-outline:hover{border-color:var(--primary);}
+.btn-accent{background:var(--accent); color:var(--primary-dark);}
+.btn-success{background:var(--success); color:#fff;}
+.btn-error{background:var(--error); color:#fff;}
+.btn-sm{padding:6px 11px; font-size:11.5px;}
+.btn svg{width:14px; height:14px;}
+
+.badge{display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; white-space:nowrap;}
+.badge::before{content:''; width:6px; height:6px; border-radius:50%;}
+.badge.success{background:#E7F4EC; color:var(--success);}
+.badge.success::before{background:var(--success);}
+.badge.error{background:#FBEAE9; color:var(--error);}
+.badge.error::before{background:var(--error);}
+.badge.warn{background:#FEF3DC; color:var(--accent-dark);}
+.badge.warn::before{background:var(--accent-dark);}
+.badge.info{background:var(--secondary-light); color:var(--secondary);}
+.badge.info::before{background:var(--secondary);}
+.badge.muted{background:#EEF2F5; color:var(--text2);}
+.badge.muted::before{background:var(--text2);}
+
+table{width:100%; border-collapse:collapse;}
+th{text-align:left; font-size:10.8px; text-transform:uppercase; letter-spacing:.04em; color:var(--text2); font-weight:700; padding:10px 14px; border-bottom:1px solid var(--border); white-space:nowrap;}
+td{padding:12px 14px; border-bottom:1px solid var(--border); font-size:13px; vertical-align:middle;}
+tbody tr:hover{background:#FAFBFC;}
+.table-wrap{overflow-x:auto; border-radius:var(--radius); border:1px solid var(--border);}
+.table-wrap table{border:none;}
+.table-wrap .card-head{padding:16px 18px 0;}
+
+.toolbar{display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap;}
+.filter-select, .filter-input{border:1px solid var(--border); background:#fff; border-radius:8px; padding:8px 12px; font-size:12.5px; font-family:inherit; color:var(--text); outline:none;}
+.tag-name{font-weight:600;}
+.tag-sub{color:var(--text2); font-size:11.5px; margin-top:2px;}
+
+.tabs{display:flex; gap:4px; border-bottom:1px solid var(--border); margin-bottom:18px;}
+.tab{padding:10px 16px; font-size:12.8px; font-weight:600; color:var(--text2); border-bottom:2px solid transparent; cursor:pointer;}
+.tab.active{color:var(--primary); border-color:var(--primary);}
+
+.progress{height:7px; background:var(--border); border-radius:20px; overflow:hidden;}
+.progress > div{height:100%; background:var(--secondary); border-radius:20px;}
+
+.section-title{font-size:15px; font-weight:700; margin:26px 0 14px;}
+.section-title:first-child{margin-top:0;}
+.muted{color:var(--text2);}
+
+/* Modal / Drawer */
+.overlay{position:fixed; inset:0; background:rgba(18,52,77,.45); display:none; align-items:center; justify-content:flex-end; z-index:100;}
+.overlay.show{display:flex;}
+.drawer{width:560px; max-width:92vw; height:100%; background:#fff; overflow-y:auto; box-shadow:-6px 0 30px rgba(0,0,0,.15); animation:slideIn .25s ease;}
+@keyframes slideIn{from{transform:translateX(30px); opacity:0;} to{transform:none; opacity:1;}}
+.drawer-head{display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid var(--border); position:sticky; top:0; background:#fff; z-index:2;}
+.drawer-body{padding:22px 24px;}
+.close-btn{width:32px; height:32px; border-radius:8px; border:1px solid var(--border); background:#fff; display:flex; align-items:center; justify-content:center;}
+.close-btn svg{width:15px; height:15px;}
+.field-row{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;}
+.field label{font-size:11px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:.03em; display:block; margin-bottom:5px;}
+.field .fval{font-size:13.5px; font-weight:500; padding:9px 0; border-bottom:1px dashed var(--border);}
+
+/* Map */
+#map{height:520px; border-radius:var(--radius); border:1px solid var(--border);}
+.leaflet-popup-content{font-family:'Inter',sans-serif; font-size:12.5px;}
+
+/* Charts */
+.chart-box{position:relative; height:260px;}
+.chart-box.tall{height:320px;}
+
+/* misc */
+.flexbtw{display:flex; align-items:center; justify-content:space-between;}
+.stack-8>*+*{margin-top:8px;}
+.stack-14>*+*{margin-top:14px;}
+.opp-card{border:1px solid var(--border); border-radius:var(--radius); padding:16px; background:#fff;}
+.opp-card .cat{font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--secondary);}
+.opp-card h4{font-size:14px; margin:6px 0 4px;}
+.opp-card p{font-size:12.5px; color:var(--text2); line-height:1.5;}
+.opp-meta{display:flex; gap:14px; margin-top:12px; font-size:11.5px; color:var(--text2);}
+.avatar-sm{width:26px; height:26px; border-radius:50%; background:var(--primary); color:#fff; font-size:10.5px; font-weight:700; display:flex; align-items:center; justify-content:center;}
+
+.hint-banner{display:flex; gap:12px; align-items:flex-start; background:var(--secondary-light); border:1px solid #BFE6E8; border-radius:var(--radius); padding:14px 16px; margin-bottom:20px; font-size:12.5px; color:#0b5560;}
+.hint-banner svg{width:18px; height:18px; flex-shrink:0; color:var(--secondary); margin-top:1px;}
+
+.step-tracker{display:flex; align-items:center; margin-bottom:22px;}
+.step{display:flex; align-items:center; gap:9px; flex:1; position:relative;}
+.step .circ{width:26px; height:26px; border-radius:50%; background:var(--border); color:var(--text2); font-size:11.5px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; z-index:1;}
+.step.done .circ{background:var(--success); color:#fff;}
+.step.current .circ{background:var(--primary); color:#fff;}
+.step .lbl{font-size:11.5px; font-weight:600; color:var(--text2); white-space:nowrap;}
+.step.current .lbl, .step.done .lbl{color:var(--text);}
+.step:not(:last-child)::after{content:''; position:absolute; left:36px; right:-20px; top:13px; height:2px; background:var(--border);}
+.step.done:not(:last-child)::after{background:var(--success);}
+
+.form-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.form-field label{font-size:11.5px; font-weight:700; color:var(--text2); display:block; margin-bottom:6px;}
+.form-field input, .form-field select{width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px; outline:none; background:#fff;}
+.form-field input:focus, .form-field select:focus{border-color:var(--primary);}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="mark">MB</div>
+      <div class="name">Manufacturing BIS<span>Federal Democratic Republic of Ethiopia</span></div>
+    </div>
+    <div class="nav-scroll" id="navScroll"></div>
+    <div class="sidebar-foot">v1.4.0 · Demo data<br>Last sync: 23 Jul 2026, 08:12</div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div>
+          <div class="page-title" id="pageTitle">Executive Dashboard</div>
+          <div class="page-sub" id="pageSub">National overview · updated hourly</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input placeholder="Search enterprises, TIN, reports…">
+        </div>
+        <div class="role-switch">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="color:#667785"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <select id="roleSelect" onchange="setRole(this.value)">
+            <option value="federal">Federal Administrator</option>
+            <option value="regional">Regional Data Officer</option>
+            <option value="woreda">Woreda Officer</option>
+            <option value="analyst">Policy Analyst</option>
+            <option value="enterprise">Enterprise Manager</option>
+          </select>
+        </div>
+        <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot"></span></button>
+        <div class="user-chip">
+          <div class="avatar">TB</div>
+          <div><div class="u-name">Tsion Bekele</div><div class="u-role" id="userRoleLabel">Federal Administrator</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content" id="content">
+
+      <!-- ================= DASHBOARD ================= -->
+      <section class="page active" id="page-dashboard">
+        <div class="hint-banner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <div>This dashboard aggregates <strong>12,480</strong> registered manufacturing enterprises across 11 regions and 2 city administrations. Figures below are illustrative demo data for design review only.</div>
+        </div>
+
+        <div class="grid g4">
+          <div class="card kpi"><div class="accent-bar" style="background:var(--primary)"></div><div class="label">Registered enterprises</div><div class="value">12,480</div><span class="delta up">▲ 4.2% vs last quarter</span></div>
+          <div class="card kpi"><div class="accent-bar" style="background:var(--secondary)"></div><div class="label">Total employment</div><div class="value">614,920</div><span class="delta up">▲ 2.8% YoY</span></div>
+          <div class="card kpi"><div class="accent-bar" style="background:var(--accent)"></div><div class="label">Export revenue (USD)</div><div class="value">$1.92B</div><span class="delta up">▲ 6.1% YoY</span></div>
+          <div class="card kpi"><div class="accent-bar" style="background:var(--error)"></div><div class="label">Pending verifications</div><div class="value">1,206</div><span class="delta down">▼ 3.4% this week</span></div>
+        </div>
+
+        <div class="grid g2" style="margin-top:18px;">
+          <div class="card">
+            <div class="card-head"><div class="card-title">Enterprise growth &amp; verification<small>Registered vs. verified, last 12 months</small></div><a class="link-btn" href="#analytics">Full dashboard →</a></div>
+            <div class="chart-box"><canvas id="chGrowth"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Enterprises by sector<small>Share of registered enterprises</small></div><a class="link-btn" href="#analytics">Details →</a></div>
+            <div class="chart-box"><canvas id="chSector"></canvas></div>
+          </div>
+        </div>
+
+        <div class="grid g3" style="margin-top:18px;">
+          <div class="card" style="grid-column:span 2;">
+            <div class="card-head"><div class="card-title">Regional performance<small>Employment &amp; production index by region</small></div><a class="link-btn" href="#gis">Open map →</a></div>
+            <div class="chart-box"><canvas id="chRegion"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Review &amp; approval queue<small>Awaiting action</small></div><a class="link-btn" href="#review">Open queue →</a></div>
+            <div class="stack-14" style="margin-top:6px;">
+              <div class="flexbtw"><span class="muted">Woreda review</span><span class="mono" style="font-weight:700;">312</span></div>
+              <div class="progress"><div style="width:64%; background:var(--info);"></div></div>
+              <div class="flexbtw"><span class="muted">Zonal review</span><span class="mono" style="font-weight:700;">184</span></div>
+              <div class="progress"><div style="width:41%; background:var(--secondary);"></div></div>
+              <div class="flexbtw"><span class="muted">Regional approval</span><span class="mono" style="font-weight:700;">96</span></div>
+              <div class="progress"><div style="width:28%; background:var(--primary);"></div></div>
+              <div class="flexbtw"><span class="muted">Federal approval</span><span class="mono" style="font-weight:700;">28</span></div>
+              <div class="progress"><div style="width:12%; background:var(--accent-dark);"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid g2" style="margin-top:18px;">
+          <div class="card">
+            <div class="card-head"><div class="card-title">Recent activity<small>System-wide events</small></div></div>
+            <div class="stack-14" id="activityFeed"></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Data quality overview<small>Composite score by domain</small></div><a class="link-btn">View report →</a></div>
+            <div class="chart-box"><canvas id="chQuality"></canvas></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ENTERPRISES ================= -->
+      <section class="page" id="page-enterprises">
+        <div class="toolbar">
+          <div class="search-box" style="width:260px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input placeholder="Search name, TIN, license no."></div>
+          <select class="filter-select"><option>All regions</option><option>Addis Ababa</option><option>Oromia</option><option>Amhara</option><option>Tigray</option><option>SNNPR</option></select>
+          <select class="filter-select"><option>All sectors</option><option>Food &amp; Beverage</option><option>Textile &amp; Garment</option><option>Leather &amp; Footwear</option><option>Chemicals</option><option>Metal &amp; Engineering</option></select>
+          <select class="filter-select"><option>All sizes</option><option>Micro</option><option>Small</option><option>Medium</option><option>Large</option></select>
+          <select class="filter-select"><option>Any status</option><option>Active</option><option>Pending verification</option><option>Suspended</option></select>
+          <div style="margin-left:auto; display:flex; gap:8px;">
+            <button class="btn btn-outline btn-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Export list</button>
+            <button class="btn btn-primary btn-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Register enterprise</button>
+          </div>
+        </div>
+        <div class="table-wrap card" style="padding:0;">
+          <div class="card-head"><div class="card-title">Enterprise Registry<small>12,480 records · showing 8</small></div></div>
+          <table>
+            <thead><tr><th>Enterprise</th><th>TIN</th><th>Sector</th><th>Region</th><th>Size</th><th>Employees</th><th>Status</th><th></th></tr></thead>
+            <tbody id="entTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= DATA COLLECTION ================= -->
+      <section class="page" id="page-collection">
+        <div class="tabs">
+          <div class="tab active" data-t="campaigns" onclick="switchTab(this,'collection')">Active campaigns</div>
+          <div class="tab" data-t="form" onclick="switchTab(this,'collection')">Baseline form preview</div>
+          <div class="tab" data-t="builder" onclick="switchTab(this,'collection')">Questionnaire builder</div>
+        </div>
+
+        <div class="tabpane" data-p="campaigns">
+          <div class="grid g3" id="campaignCards"></div>
+        </div>
+
+        <div class="tabpane" data-p="form" style="display:none;">
+          <div class="card">
+            <div class="card-head"><div class="card-title">2026 Annual Manufacturing Survey<small>Section 2 of 7 — Employment, Wages &amp; Salaries</small></div><span class="badge info">Draft saved 09:41</span></div>
+            <div class="step-tracker">
+              <div class="step done"><div class="circ">✓</div><div class="lbl">Establishment</div></div>
+              <div class="step current"><div class="circ">2</div><div class="lbl">Employment</div></div>
+              <div class="step"><div class="circ">3</div><div class="lbl">Products &amp; Sales</div></div>
+              <div class="step"><div class="circ">4</div><div class="lbl">Raw Materials</div></div>
+              <div class="step"><div class="circ">5</div><div class="lbl">Costs</div></div>
+              <div class="step"><div class="circ">6</div><div class="lbl">Assets</div></div>
+              <div class="step"><div class="circ">7</div><div class="lbl">Review</div></div>
+            </div>
+            <div class="form-grid">
+              <div class="form-field"><label>Total permanent employees</label><input value="184"></div>
+              <div class="form-field"><label>Total temporary / contract employees</label><input value="47"></div>
+              <div class="form-field"><label>Female employees</label><input value="96"></div>
+              <div class="form-field"><label>Male employees</label><input value="135"></div>
+              <div class="form-field"><label>Employees with disability</label><input value="4"></div>
+              <div class="form-field"><label>Foreign nationals employed</label><input value="2"></div>
+              <div class="form-field"><label>New jobs created this period</label><input value="18"></div>
+              <div class="form-field"><label>Vacancies (unfilled)</label><input value="6"></div>
+              <div class="form-field"><label>Average monthly wage (ETB)</label><input value="8,450"></div>
+              <div class="form-field"><label>Predominant skill category</label><select><option>Skilled</option><option>Semi-skilled</option><option>Unskilled</option></select></div>
+            </div>
+            <div class="flexbtw" style="margin-top:20px;">
+              <span class="muted" style="font-size:12px;">Auto-calculated: Total headcount = <strong class="mono">231</strong></span>
+              <div style="display:flex; gap:10px;">
+                <button class="btn btn-outline btn-sm">Save draft</button>
+                <button class="btn btn-outline btn-sm">← Previous</button>
+                <button class="btn btn-primary btn-sm">Next: Products &amp; Sales →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" data-p="builder" style="display:none;">
+          <div class="grid g2">
+            <div class="card">
+              <div class="card-title" style="margin-bottom:12px;">Section: Raw Materials &amp; Inputs</div>
+              <div class="stack-8">
+                <div style="border:1px solid var(--border); border-radius:8px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center;"><span>Input type &amp; name <span class="badge muted" style="margin-left:6px;">Text</span></span><span class="muted" style="font-size:11px;">Required</span></div>
+                <div style="border:1px solid var(--border); border-radius:8px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center;"><span>Local or imported <span class="badge muted" style="margin-left:6px;">Single-select</span></span><span class="muted" style="font-size:11px;">Required</span></div>
+                <div style="border:1px solid var(--border); border-radius:8px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center;"><span>Source country <span class="badge muted" style="margin-left:6px;">Single-select</span></span><span class="muted" style="font-size:11px;">Conditional: shown if imported</span></div>
+                <div style="border:1px solid var(--border); border-radius:8px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center;"><span>Quantity &amp; unit cost <span class="badge muted" style="margin-left:6px;">Table / repeating</span></span><span class="muted" style="font-size:11px;">Calculated total</span></div>
+                <button class="btn btn-outline btn-sm">+ Add field</button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title" style="margin-bottom:12px;">Campaign settings</div>
+              <div class="form-grid">
+                <div class="form-field"><label>Assign by sector</label><select><option>All sectors</option><option>Food &amp; Beverage only</option></select></div>
+                <div class="form-field"><label>Assign by enterprise size</label><select><option>All sizes</option><option>Medium &amp; Large only</option></select></div>
+                <div class="form-field"><label>Opening date</label><input value="01 Aug 2026"></div>
+                <div class="form-field"><label>Closing date</label><input value="30 Sep 2026"></div>
+              </div>
+              <div style="margin-top:16px; display:flex; gap:10px;">
+                <button class="btn btn-outline btn-sm">Preview form</button>
+                <button class="btn btn-accent btn-sm">Publish campaign</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= REVIEW & APPROVAL ================= -->
+      <section class="page" id="page-review">
+        <div class="tabs">
+          <div class="tab active" data-t="queue" onclick="switchTab(this,'review')">My queue (42)</div>
+          <div class="tab" data-t="history" onclick="switchTab(this,'review')">Decision history</div>
+        </div>
+        <div class="tabpane" data-p="queue">
+          <div class="table-wrap card" style="padding:0;">
+            <table>
+              <thead><tr><th>Submission</th><th>Enterprise</th><th>Campaign</th><th>Submitted</th><th>Level</th><th>Quality flags</th><th></th></tr></thead>
+              <tbody id="reviewTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="tabpane" data-p="history" style="display:none;">
+          <div class="table-wrap card" style="padding:0;">
+            <table>
+              <thead><tr><th>Submission</th><th>Enterprise</th><th>Decision</th><th>By</th><th>Date</th><th>Reason</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">SUB-20493</td><td class="tag-name">Bahir Dar Textiles PLC</td><td><span class="badge success">Approved</span></td><td>A. Girma</td><td>21 Jul 2026</td><td class="muted">—</td></tr>
+                <tr><td class="mono">SUB-20488</td><td class="tag-name">Adama Agro Processing</td><td><span class="badge error">Rejected</span></td><td>S. Fikru</td><td>21 Jul 2026</td><td class="muted">Employment figures inconsistent with prior quarter</td></tr>
+                <tr><td class="mono">SUB-20475</td><td class="tag-name">Mekelle Metal Works</td><td><span class="badge warn">Returned</span></td><td>H. Tesfaye</td><td>20 Jul 2026</td><td class="muted">Missing production capacity attachment</td></tr>
+                <tr><td class="mono">SUB-20461</td><td class="tag-name">Hawassa Leather Products</td><td><span class="badge success">Approved</span></td><td>A. Girma</td><td>19 Jul 2026</td><td class="muted">—</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= GIS ================= -->
+      <section class="page" id="page-gis">
+        <div class="toolbar">
+          <select class="filter-select"><option>Point map</option><option>Marker clusters</option><option>Heat map — density</option><option>Choropleth — by region</option></select>
+          <select class="filter-select"><option>All sectors</option><option>Food &amp; Beverage</option><option>Textile &amp; Garment</option><option>Chemicals</option></select>
+          <select class="filter-select"><option>All sizes</option><option>Micro</option><option>Small</option><option>Medium</option><option>Large</option></select>
+          <label style="display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--text2);"><input type="checkbox" checked> Industrial parks</label>
+          <label style="display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--text2);"><input type="checkbox"> Transport network</label>
+          <div style="margin-left:auto;"><button class="btn btn-outline btn-sm">Export map</button></div>
+        </div>
+        <div class="grid" style="grid-template-columns:1fr 300px; gap:18px;">
+          <div id="map"></div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:10px;">Selected enterprise</div>
+            <div class="tag-name">Bole Lemi Garments PLC</div>
+            <div class="tag-sub">Textile &amp; Garment · Medium · Addis Ababa</div>
+            <div class="stack-8" style="margin-top:14px; font-size:12.5px;">
+              <div class="flexbtw"><span class="muted">Employees</span><span class="mono">312</span></div>
+              <div class="flexbtw"><span class="muted">Capacity utilization</span><span class="mono">78%</span></div>
+              <div class="flexbtw"><span class="muted">Export status</span><span class="badge success">Exporting</span></div>
+              <div class="flexbtw"><span class="muted">Coordinates</span><span class="mono">8.9806, 38.7578</span></div>
+            </div>
+            <button class="btn btn-primary btn-sm" style="width:100%; justify-content:center; margin-top:16px;">Open full profile</button>
+            <div class="section-title" style="font-size:12.5px; margin:18px 0 8px;">Cluster summary</div>
+            <div class="stack-8" style="font-size:12.5px;">
+              <div class="flexbtw"><span class="muted">Enterprises in view</span><span class="mono">1,842</span></div>
+              <div class="flexbtw"><span class="muted">Industrial parks</span><span class="mono">6</span></div>
+              <div class="flexbtw"><span class="muted">Avg. distance to port road</span><span class="mono">14.2 km</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ANALYTICS ================= -->
+      <section class="page" id="page-analytics">
+        <div class="toolbar">
+          <select class="filter-select"><option>2026 · Q2</option><option>2026 · Q1</option><option>2025 · Q4</option></select>
+          <select class="filter-select"><option>All regions</option><option>Addis Ababa</option><option>Oromia</option><option>Amhara</option></select>
+          <select class="filter-select"><option>All sectors</option><option>Food &amp; Beverage</option><option>Textile &amp; Garment</option></select>
+          <div style="margin-left:auto; display:flex; gap:8px;">
+            <button class="btn btn-outline btn-sm">Save view</button>
+            <button class="btn btn-outline btn-sm">Presentation mode</button>
+            <button class="btn btn-primary btn-sm">Export PDF</button>
+          </div>
+        </div>
+        <div class="grid g4">
+          <div class="card kpi"><div class="accent-bar" style="background:var(--primary)"></div><div class="label">Production index</div><div class="value">108.4</div><span class="delta up">▲ 3.1 pts</span></div>
+          <div class="card kpi"><div class="accent-bar" style="background:var(--secondary)"></div><div class="label">Capacity utilization</div><div class="value">71.6%</div><span class="delta up">▲ 1.8 pts</span></div>
+          <div class="card kpi"><div class="accent-bar" style="background:var(--accent)"></div><div class="label">FDI inflow (USD)</div><div class="value">$318M</div><span class="delta down">▼ 2.2%</span></div>
+          <div class="card kpi"><div class="accent-bar" style="background:var(--info)"></div><div class="label">Import dependency</div><div class="value">46.3%</div><span class="delta down">▼ 0.9 pts</span></div>
+        </div>
+        <div class="grid g2" style="margin-top:18px;">
+          <div class="card"><div class="card-title" style="margin-bottom:12px;">Production &amp; sales trend<small>ETB billions</small></div><div class="chart-box"><canvas id="chProdSales"></canvas></div></div>
+          <div class="card"><div class="card-title" style="margin-bottom:12px;">Employment by gender &amp; region</div><div class="chart-box"><canvas id="chGender"></canvas></div></div>
+        </div>
+        <div class="grid g2" style="margin-top:18px;">
+          <div class="card"><div class="card-title" style="margin-bottom:12px;">Top constraints reported by enterprises</div><div class="chart-box"><canvas id="chConstraints"></canvas></div></div>
+          <div class="card"><div class="card-title" style="margin-bottom:12px;">ICT adoption</div><div class="chart-box"><canvas id="chIct"></canvas></div></div>
+        </div>
+      </section>
+
+      <!-- ================= REPORTS ================= -->
+      <section class="page" id="page-reports">
+        <div class="toolbar">
+          <div class="search-box" style="width:260px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input placeholder="Search report catalogue"></div>
+          <select class="filter-select"><option>All categories</option><option>Employment</option><option>Production</option><option>Trade</option><option>Investment</option></select>
+          <div style="margin-left:auto;"><button class="btn btn-primary btn-sm">+ New report</button></div>
+        </div>
+        <div class="table-wrap card" style="padding:0;">
+          <table>
+            <thead><tr><th>Report</th><th>Category</th><th>Period</th><th>Last published</th><th>Status</th><th></th></tr></thead>
+            <tbody id="reportTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= LINKAGE / OPPORTUNITIES ================= -->
+      <section class="page" id="page-linkage">
+        <div class="tabs">
+          <div class="tab active" data-t="opps" onclick="switchTab(this,'linkage')">Market opportunities</div>
+          <div class="tab" data-t="requests" onclick="switchTab(this,'linkage')">Linkage requests</div>
+        </div>
+        <div class="tabpane" data-p="opps">
+          <div class="toolbar">
+            <select class="filter-select"><option>All types</option><option>Buying</option><option>Supplying</option><option>Investment</option><option>Export</option></select>
+            <select class="filter-select"><option>All sectors</option><option>Food &amp; Beverage</option><option>Textile &amp; Garment</option></select>
+            <div style="margin-left:auto;"><button class="btn btn-primary btn-sm">+ Post opportunity</button></div>
+          </div>
+          <div class="grid g3" id="oppCards"></div>
+        </div>
+        <div class="tabpane" data-p="requests" style="display:none;">
+          <div class="table-wrap card" style="padding:0;">
+            <table>
+              <thead><tr><th>From</th><th>To</th><th>Type</th><th>Status</th><th>Sent</th><th></th></tr></thead>
+              <tbody>
+                <tr><td class="tag-name">Adama Agro Processing</td><td class="tag-name">Nile Foods Export Buyers</td><td><span class="badge info">Supplying</span></td><td><span class="badge warn">Awaiting response</span></td><td>18 Jul 2026</td><td><button class="btn btn-outline btn-sm">View</button></td></tr>
+                <tr><td class="tag-name">Bole Lemi Garments PLC</td><td class="tag-name">EuroTex Sourcing Ltd.</td><td><span class="badge info">Buying</span></td><td><span class="badge success">Accepted</span></td><td>12 Jul 2026</td><td><button class="btn btn-outline btn-sm">View</button></td></tr>
+                <tr><td class="tag-name">Horizon Capital Partners</td><td class="tag-name">Hawassa Leather Products</td><td><span class="badge muted">Investment</span></td><td><span class="badge error">Declined</span></td><td>05 Jul 2026</td><td><button class="btn btn-outline btn-sm">View</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= BENCHMARK ================= -->
+      <section class="page" id="page-benchmark">
+        <div class="toolbar">
+          <select class="filter-select"><option>Sector: Textile &amp; Garment</option><option>Sector: Food &amp; Beverage</option><option>Sector: Leather &amp; Footwear</option></select>
+          <select class="filter-select"><option>Peers: Kenya, Vietnam, Bangladesh</option><option>Peers: Sub-Saharan Africa avg.</option></select>
+        </div>
+        <div class="grid g2">
+          <div class="card"><div class="card-title" style="margin-bottom:12px;">Labor productivity (USD output / worker)</div><div class="chart-box"><canvas id="chBenchProd"></canvas></div></div>
+          <div class="card"><div class="card-title" style="margin-bottom:12px;">Export share of manufacturing output</div><div class="chart-box"><canvas id="chBenchExp"></canvas></div></div>
+        </div>
+        <div class="card" style="margin-top:18px;">
+          <div class="card-title" style="margin-bottom:12px;">Gap analysis vs. peer average</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Indicator</th><th>Ethiopia</th><th>Peer average</th><th>Gap</th><th>Trend</th></tr></thead>
+              <tbody>
+                <tr><td>Labor productivity (USD/worker)</td><td class="mono">4,120</td><td class="mono">6,850</td><td><span class="badge error">-39.8%</span></td><td class="mono">↗</td></tr>
+                <tr><td>Export share (%)</td><td class="mono">18.2</td><td class="mono">31.4</td><td><span class="badge error">-13.2 pts</span></td><td class="mono">↗</td></tr>
+                <tr><td>Capacity utilization (%)</td><td class="mono">71.6</td><td class="mono">76.9</td><td><span class="badge warn">-5.3 pts</span></td><td class="mono">→</td></tr>
+                <tr><td>Technology automation index</td><td class="mono">2.4 / 5</td><td class="mono">3.1 / 5</td><td><span class="badge error">-0.7</span></td><td class="mono">↗</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= NOTIFICATIONS ================= -->
+      <section class="page" id="page-notifications">
+        <div class="card" style="max-width:720px;">
+          <div class="card-head"><div class="card-title">Notifications</div><a class="link-btn">Mark all read</a></div>
+          <div class="stack-14" id="notifList"></div>
+        </div>
+      </section>
+
+      <!-- ================= USERS & ACCESS ================= -->
+      <section class="page" id="page-users">
+        <div class="toolbar">
+          <div class="search-box" style="width:240px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input placeholder="Search users"></div>
+          <select class="filter-select"><option>All roles</option><option>Federal</option><option>Regional</option><option>Woreda</option><option>Enterprise</option></select>
+          <div style="margin-left:auto;"><button class="btn btn-primary btn-sm">+ Create user</button></div>
+        </div>
+        <div class="table-wrap card" style="padding:0;">
+          <table>
+            <thead><tr><th>User</th><th>Role</th><th>Jurisdiction</th><th>Last login</th><th>Status</th><th></th></tr></thead>
+            <tbody id="userTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= AUDIT ================= -->
+      <section class="page" id="page-audit">
+        <div class="toolbar">
+          <input class="filter-input" placeholder="Search by user, entity, action">
+          <select class="filter-select"><option>All actions</option><option>Login</option><option>Create</option><option>Update</option><option>Approve</option><option>Reject</option></select>
+          <input class="filter-input" type="date">
+          <div style="margin-left:auto;"><button class="btn btn-outline btn-sm">Export CSV</button></div>
+        </div>
+        <div class="table-wrap card" style="padding:0;">
+          <table>
+            <thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Entity</th><th>IP address</th><th>Outcome</th></tr></thead>
+            <tbody id="auditTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= CONFIGURATION ================= -->
+      <section class="page" id="page-config">
+        <div class="grid g2">
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px;">Master data</div>
+            <div class="stack-8" id="masterDataList"></div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px;">System parameters</div>
+            <div class="form-grid">
+              <div class="form-field"><label>Default language</label><select><option>English</option><option>Amharic</option><option>Afaan Oromo</option><option>Tigrinya</option></select></div>
+              <div class="form-field"><label>Fiscal year start</label><select><option>Hamle 1 (8 July)</option></select></div>
+              <div class="form-field"><label>Session timeout (minutes)</label><input value="30"></div>
+              <div class="form-field"><label>Password policy</label><select><option>Strong (12+ chars, MFA required)</option></select></div>
+              <div class="form-field"><label>Data-quality alert threshold</label><input value="85%"></div>
+              <div class="form-field"><label>Mobile minimum version</label><input value="v2.3.0"></div>
+            </div>
+            <button class="btn btn-primary btn-sm" style="margin-top:16px;">Save parameters</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============ ENTERPRISE DETAIL DRAWER ============ -->
+<div class="overlay" id="drawerOverlay" onclick="if(event.target===this) closeDrawer()">
+  <div class="drawer">
+    <div class="drawer-head">
+      <div>
+        <div style="font-weight:700; font-size:15.5px;" id="drawerName">Bole Lemi Garments PLC</div>
+        <div class="muted" style="font-size:12px; margin-top:2px;" id="drawerSub">TIN 0012348765 · Registered 2018</div>
+      </div>
+      <button class="close-btn" onclick="closeDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="drawer-body">
+      <div style="display:flex; gap:8px; margin-bottom:18px;">
+        <span class="badge success" id="drawerStatus">Active</span>
+        <span class="badge info">Medium enterprise</span>
+        <span class="badge muted">Exporting</span>
+      </div>
+      <div class="section-title" style="font-size:12.5px; margin-top:0;">Identification</div>
+      <div class="field-row">
+        <div class="field"><label>Legal name</label><div class="fval" id="dfLegal">Bole Lemi Garments PLC</div></div>
+        <div class="field"><label>Trade name</label><div class="fval">BLG Apparel</div></div>
+        <div class="field"><label>Establishment year</label><div class="fval">2018</div></div>
+        <div class="field"><label>Legal form</label><div class="fval">Private Limited Company</div></div>
+      </div>
+      <div class="section-title" style="font-size:12.5px;">Classification</div>
+      <div class="field-row">
+        <div class="field"><label>Sector / subsector</label><div class="fval">Textile &amp; Garment / Apparel</div></div>
+        <div class="field"><label>ISIC code</label><div class="fval mono">1410</div></div>
+        <div class="field"><label>Ownership</label><div class="fval">Domestic private</div></div>
+        <div class="field"><label>Industrial park</label><div class="fval">Bole Lemi Industrial Park</div></div>
+      </div>
+      <div class="section-title" style="font-size:12.5px;">Contact &amp; Location</div>
+      <div class="field-row">
+        <div class="field"><label>Manager</label><div class="fval">Aster Kebede</div></div>
+        <div class="field"><label>Phone</label><div class="fval mono">+251 91 234 5678</div></div>
+        <div class="field"><label>Region / Zone / Woreda</label><div class="fval">Addis Ababa / Bole</div></div>
+        <div class="field"><label>Coordinates</label><div class="fval mono">8.9806, 38.7578</div></div>
+      </div>
+      <div class="section-title" style="font-size:12.5px;">Latest submission</div>
+      <div class="card" style="background:var(--bg); border-style:dashed;">
+        <div class="flexbtw"><span style="font-weight:600;">2026 Annual Manufacturing Survey</span><span class="badge warn">Pending review</span></div>
+        <div class="muted" style="font-size:12px; margin-top:6px;">Submitted 18 Jul 2026 by Aster Kebede · 3 data-quality flags</div>
+      </div>
+      <div class="section-title" style="font-size:12.5px;">Documents</div>
+      <div class="stack-8">
+        <div class="flexbtw" style="font-size:12.5px;"><span>Business license.pdf</span><span class="badge success">Verified</span></div>
+        <div class="flexbtw" style="font-size:12.5px;"><span>Investment permit.pdf</span><span class="badge success">Verified</span></div>
+        <div class="flexbtw" style="font-size:12.5px;"><span>Tax clearance 2025.pdf</span><span class="badge warn">Expiring in 21 days</span></div>
+      </div>
+      <div style="display:flex; gap:10px; margin-top:22px;">
+        <button class="btn btn-outline" style="flex:1; justify-content:center;">Edit profile</button>
+        <button class="btn btn-primary" style="flex:1; justify-content:center;">View full history</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =================================================================
+   MOCK DATA
+================================================================= */
+const enterprises = [
+  {name:"Bole Lemi Garments PLC", tin:"0012348765", sector:"Textile & Garment", region:"Addis Ababa", size:"Medium", emp:312, status:"Active"},
+  {name:"Adama Agro Processing", tin:"0019287341", sector:"Food & Beverage", region:"Oromia", size:"Large", emp:540, status:"Active"},
+  {name:"Mekelle Metal Works", tin:"0027461982", sector:"Metal & Engineering", region:"Tigray", size:"Small", emp:64, status:"Pending verification"},
+  {name:"Hawassa Leather Products", tin:"0033921874", sector:"Leather & Footwear", region:"Sidama", size:"Medium", emp:228, status:"Active"},
+  {name:"Bahir Dar Textiles PLC", tin:"0041872365", sector:"Textile & Garment", region:"Amhara", size:"Large", emp:701, status:"Active"},
+  {name:"Dire Dawa Chemical Industries", tin:"0058213764", sector:"Chemicals", region:"Dire Dawa", size:"Medium", emp:156, status:"Suspended"},
+  {name:"Gondar Food Complex", tin:"0064918273", sector:"Food & Beverage", region:"Amhara", size:"Small", emp:38, status:"Active"},
+  {name:"Jimma Coffee Processors", tin:"0071823649", sector:"Food & Beverage", region:"Oromia", size:"Medium", emp:189, status:"Pending verification"},
+];
+
+const statusBadge = s => s==="Active" ? '<span class="badge success">Active</span>' : s==="Suspended" ? '<span class="badge error">Suspended</span>' : '<span class="badge warn">Pending verification</span>';
+
+function initials(n){ return n.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase(); }
+
+document.getElementById("entTableBody").innerHTML = enterprises.map(e=>`
+  <tr onclick="openDrawer('${e.name.replace(/'/g,"\\'")}')" style="cursor:pointer;">
+    <td><div style="display:flex; align-items:center; gap:10px;"><div class="avatar-sm">${initials(e.name)}</div><div><div class="tag-name">${e.name}</div><div class="tag-sub">${e.region}</div></div></div></td>
+    <td class="mono">${e.tin}</td>
+    <td>${e.sector}</td>
+    <td>${e.region}</td>
+    <td>${e.size}</td>
+    <td class="mono">${e.emp}</td>
+    <td>${statusBadge(e.status)}</td>
+    <td><button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); openDrawer('${e.name.replace(/'/g,"\\'")}')">View</button></td>
+  </tr>`).join("");
+
+function openDrawer(name){
+  const e = enterprises.find(x=>x.name===name) || enterprises[0];
+  document.getElementById("drawerName").textContent = e.name;
+  document.getElementById("drawerSub").textContent = `TIN ${e.tin} · ${e.region}`;
+  document.getElementById("dfLegal").textContent = e.name;
+  document.getElementById("drawerStatus").outerHTML = statusBadge(e.status);
+  document.getElementById("drawerOverlay").classList.add("show");
+}
+function closeDrawer(){ document.getElementById("drawerOverlay").classList.remove("show"); }
+
+/* Activity feed */
+const activity = [
+  {who:"Aster Kebede", act:"submitted the 2026 Annual Survey", ent:"Bole Lemi Garments PLC", time:"12 min ago", color:"info"},
+  {who:"Samuel Fikru", act:"rejected submission SUB-20488", ent:"Adama Agro Processing", time:"48 min ago", color:"error"},
+  {who:"System", act:"completed nightly ETL sync from Customs Commission", ent:"1,204 records processed", time:"2 hr ago", color:"muted"},
+  {who:"Helen Tesfaye", act:"returned submission for correction", ent:"Mekelle Metal Works", time:"3 hr ago", color:"warn"},
+  {who:"Abrham Girma", act:"approved regional aggregation", ent:"Amhara Region · Q2 2026", time:"5 hr ago", color:"success"},
+];
+document.getElementById("activityFeed").innerHTML = activity.map(a=>`
+  <div style="display:flex; gap:10px;">
+    <span class="badge ${a.color}" style="width:7px; height:7px; padding:0; border-radius:50%; margin-top:6px;"></span>
+    <div style="font-size:12.8px; line-height:1.5;"><strong>${a.who}</strong> ${a.act} <span class="muted">— ${a.ent}</span><div class="muted" style="font-size:11px; margin-top:1px;">${a.time}</div></div>
+  </div>`).join("");
+
+/* Review queue */
+const reviewQueue = [
+  {id:"SUB-20512", ent:"Jimma Coffee Processors", camp:"2026 Annual Survey", sub:"22 Jul 2026", level:"Zonal", flags:2},
+  {id:"SUB-20509", ent:"Gondar Food Complex", camp:"2026 Annual Survey", sub:"22 Jul 2026", level:"Woreda", flags:0},
+  {id:"SUB-20501", ent:"Dire Dawa Chemical Industries", camp:"Q2 ICT Adoption Survey", sub:"21 Jul 2026", level:"Regional", flags:3},
+  {id:"SUB-20498", ent:"Hawassa Leather Products", camp:"2026 Annual Survey", sub:"20 Jul 2026", level:"Federal", flags:1},
+  {id:"SUB-20494", ent:"Bole Lemi Garments PLC", camp:"2026 Annual Survey", sub:"18 Jul 2026", level:"Zonal", flags:3},
+];
+document.getElementById("reviewTableBody").innerHTML = reviewQueue.map(r=>`
+  <tr>
+    <td class="mono">${r.id}</td>
+    <td class="tag-name">${r.ent}</td>
+    <td>${r.camp}</td>
+    <td>${r.sub}</td>
+    <td><span class="badge info">${r.level}</span></td>
+    <td>${r.flags>0 ? `<span class="badge warn">${r.flags} flags</span>` : `<span class="badge success">Clean</span>`}</td>
+    <td><div style="display:flex; gap:6px;"><button class="btn btn-success btn-sm">Approve</button><button class="btn btn-outline btn-sm">Return</button><button class="btn btn-error btn-sm">Reject</button></div></td>
+  </tr>`).join("");
+
+/* Campaign cards */
+const campaigns = [
+  {name:"2026 Annual Manufacturing Survey", period:"Aug – Sep 2026", target:12480, done:8214, status:"Open"},
+  {name:"Q2 ICT Adoption Survey", period:"Jun – Jul 2026", target:4200, done:4200, status:"Closed"},
+  {name:"FDI & Investment Pulse Check", period:"Jul – Aug 2026", target:960, done:210, status:"Open"},
+  {name:"Sector-Specific: Leather Value Chain", period:"Sep 2026", target:340, done:0, status:"Scheduled"},
+  {name:"Training & Skills Gap Survey", period:"May – Jun 2026", target:5100, done:4890, status:"Closed"},
+  {name:"Technology & Automation Census", period:"Oct 2026", target:12480, done:0, status:"Scheduled"},
+];
+document.getElementById("campaignCards").innerHTML = campaigns.map(c=>{
+  const pct = Math.round(c.done/c.target*100);
+  const stBadge = c.status==="Open" ? '<span class="badge success">Open</span>' : c.status==="Closed" ? '<span class="badge muted">Closed</span>' : '<span class="badge warn">Scheduled</span>';
+  return `<div class="card">
+    <div class="flexbtw"><div class="tag-name">${c.name}</div>${stBadge}</div>
+    <div class="tag-sub" style="margin-bottom:14px;">${c.period}</div>
+    <div class="flexbtw" style="font-size:12px; margin-bottom:6px;"><span class="muted">Completion</span><span class="mono">${c.done.toLocaleString()} / ${c.target.toLocaleString()}</span></div>
+    <div class="progress"><div style="width:${pct}%;"></div></div>
+    <button class="btn btn-outline btn-sm" style="width:100%; justify-content:center; margin-top:14px;">Manage campaign</button>
+  </div>`;
+}).join("");
+
+/* Reports */
+const reports = [
+  {name:"National Enterprise Registry Report", cat:"Registry", period:"Q2 2026", pub:"15 Jul 2026", status:"Published"},
+  {name:"Employment & Wages Bulletin", cat:"Employment", period:"Q2 2026", pub:"14 Jul 2026", status:"Published"},
+  {name:"Manufacturing Production Index", cat:"Production", period:"Jun 2026", pub:"10 Jul 2026", status:"Published"},
+  {name:"Import / Export Trade Summary", cat:"Trade", period:"Q2 2026", pub:"08 Jul 2026", status:"Published"},
+  {name:"FDI & Investment Tracker", cat:"Investment", period:"Q2 2026", pub:"—", status:"In review"},
+  {name:"Regional Benchmark Comparison", cat:"Benchmark", period:"2025 annual", pub:"22 Jun 2026", status:"Published"},
+  {name:"Data Quality Scorecard", cat:"Data quality", period:"Jul 2026", pub:"—", status:"Draft"},
+];
+document.getElementById("reportTableBody").innerHTML = reports.map(r=>`
+  <tr>
+    <td class="tag-name">${r.name}</td>
+    <td><span class="badge info">${r.cat}</span></td>
+    <td>${r.period}</td>
+    <td>${r.pub}</td>
+    <td>${r.status==="Published"?'<span class="badge success">Published</span>':r.status==="Draft"?'<span class="badge muted">Draft</span>':'<span class="badge warn">In review</span>'}</td>
+    <td><div style="display:flex; gap:6px;"><button class="btn btn-outline btn-sm">View</button><button class="btn btn-outline btn-sm">PDF</button></div></td>
+  </tr>`).join("");
+
+/* Opportunities */
+const opps = [
+  {cat:"Export opportunity", title:"European buyer seeking apparel suppliers", body:"EuroTex Sourcing Ltd. is looking for 3–5 garment manufacturers with export certification for a 2027 seasonal order.", region:"Any region", views:214, expires:"12 Aug 2026"},
+  {cat:"Investment opportunity", title:"Equity investment in agro-processing", body:"Horizon Capital Partners is seeking co-investment opportunities in mid-size agro-processing enterprises.", region:"Oromia, Amhara", views:98, expires:"30 Aug 2026"},
+  {cat:"Supplying opportunity", title:"Local raw-material supply needed", body:"Adama Agro Processing requires a reliable local supplier of maize and wheat inputs, minimum 200 MT/month.", region:"Oromia", views:156, expires:"01 Sep 2026"},
+  {cat:"Partnership opportunity", title:"Technology transfer partnership", body:"A regional development partner is offering technical assistance and machinery upgrade grants to leather processors.", region:"Sidama, SNNPR", views:73, expires:"20 Sep 2026"},
+  {cat:"Buying opportunity", title:"Government tender: office furniture", body:"Federal procurement office seeking domestic manufacturers for a 1,200-unit office furniture supply contract.", region:"Any region", views:340, expires:"05 Aug 2026"},
+  {cat:"Export opportunity", title:"Coffee export market access, Gulf region", body:"Trade promotion desk highlighting new market access for processed coffee exports to Gulf Cooperation Council states.", region:"Oromia, SNNPR", views:187, expires:"15 Oct 2026"},
+];
+document.getElementById("oppCards").innerHTML = opps.map(o=>`
+  <div class="opp-card">
+    <div class="cat">${o.cat}</div>
+    <h4>${o.title}</h4>
+    <p>${o.body}</p>
+    <div class="opp-meta"><span>📍 ${o.region}</span><span>👁 ${o.views} views</span></div>
+    <div class="flexbtw" style="margin-top:12px;"><span class="muted" style="font-size:11.5px;">Expires ${o.expires}</span><button class="btn btn-primary btn-sm">Express interest</button></div>
+  </div>`).join("");
+
+/* Notifications */
+const notifs = [
+  {icon:"⚠", title:"3 documents expiring within 30 days", body:"Tax clearance certificates for 3 enterprises in your jurisdiction require renewal.", time:"10 min ago", unread:true},
+  {icon:"✅", title:"Submission approved", body:"Your 2026 Annual Manufacturing Survey submission for Bole Lemi Garments PLC has been approved at regional level.", time:"1 hr ago", unread:true},
+  {icon:"↩", title:"Correction requested", body:"Mekelle Metal Works: production-capacity attachment is missing. Please resubmit.", time:"3 hr ago", unread:true},
+  {icon:"🔔", title:"New market opportunity matches your profile", body:"Export opportunity: European buyer seeking apparel suppliers.", time:"6 hr ago", unread:false},
+  {icon:"🛠", title:"Scheduled maintenance", body:"The platform will undergo scheduled maintenance on 27 Jul 2026, 22:00–23:00 EAT.", time:"1 day ago", unread:false},
+];
+document.getElementById("notifList").innerHTML = notifs.map(n=>`
+  <div style="display:flex; gap:12px; padding:12px; border-radius:8px; ${n.unread?'background:var(--secondary-light);':''}">
+    <div style="width:34px; height:34px; border-radius:50%; background:#fff; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; flex-shrink:0;">${n.icon}</div>
+    <div><div style="font-weight:600; font-size:13px;">${n.title}</div><div class="muted" style="font-size:12.5px; margin:3px 0;">${n.body}</div><div class="muted" style="font-size:11px;">${n.time}</div></div>
+  </div>`).join("");
+
+/* Users */
+const users = [
+  {name:"Tsion Bekele", role:"Federal Administrator", juris:"National", login:"Today, 08:02", status:"Active"},
+  {name:"Abrham Girma", role:"Regional Approver", juris:"Amhara Region", login:"Today, 07:41", status:"Active"},
+  {name:"Samuel Fikru", role:"Zone Officer", juris:"East Shewa Zone", login:"Yesterday, 16:20", status:"Active"},
+  {name:"Helen Tesfaye", role:"Woreda Officer", juris:"Bole Woreda", login:"Yesterday, 14:05", status:"Active"},
+  {name:"Aster Kebede", role:"Enterprise Manager", juris:"Bole Lemi Garments PLC", login:"22 Jul 2026", status:"Active"},
+  {name:"Kalkidan Molla", role:"Policy Analyst", juris:"National", login:"20 Jul 2026", status:"Suspended"},
+];
+document.getElementById("userTableBody").innerHTML = users.map(u=>`
+  <tr>
+    <td><div style="display:flex; align-items:center; gap:10px;"><div class="avatar-sm">${initials(u.name)}</div><span class="tag-name">${u.name}</span></div></td>
+    <td>${u.role}</td>
+    <td>${u.juris}</td>
+    <td>${u.login}</td>
+    <td>${u.status==="Active"?'<span class="badge success">Active</span>':'<span class="badge error">Suspended</span>'}</td>
+    <td><button class="btn btn-outline btn-sm">Manage</button></td>
+  </tr>`).join("");
+
+/* Audit */
+const audit = [
+  {ts:"23 Jul 2026 08:12", user:"system", act:"ETL Sync", ent:"Customs Commission feed", ip:"10.20.3.1", out:"Success"},
+  {ts:"23 Jul 2026 08:04", user:"Tsion Bekele", act:"Login", ent:"—", ip:"196.188.4.21", out:"Success"},
+  {ts:"22 Jul 2026 17:30", user:"Samuel Fikru", act:"Reject", ent:"SUB-20488", ip:"196.188.9.14", out:"Success"},
+  {ts:"22 Jul 2026 16:58", user:"Helen Tesfaye", act:"Update", ent:"Mekelle Metal Works", ip:"196.188.11.2", out:"Success"},
+  {ts:"22 Jul 2026 09:15", user:"unknown", act:"Login", ent:"—", ip:"41.203.88.6", out:"Failed — locked after 5 attempts"},
+];
+document.getElementById("auditTableBody").innerHTML = audit.map(a=>`
+  <tr><td class="mono">${a.ts}</td><td>${a.user}</td><td>${a.act}</td><td>${a.ent}</td><td class="mono">${a.ip}</td><td>${a.out.includes("Success")?'<span class="badge success">Success</span>':'<span class="badge error">Failed</span>'}</td></tr>`).join("");
+
+/* Master data config list */
+const masterData = ["Sectors & Subsectors (ISIC)","Regions, Zones & Woredas","Product Categories & Units","Ownership & Legal Forms","Raw Material Categories","Currencies & Exchange Sources","Notification Templates","Workflow Statuses & Approval Levels"];
+document.getElementById("masterDataList").innerHTML = masterData.map(m=>`<div class="flexbtw" style="font-size:13px; padding:8px 0; border-bottom:1px solid var(--border);"><span>${m}</span><button class="btn btn-outline btn-sm">Manage</button></div>`).join("");
+
+/* =================================================================
+   NAVIGATION
+================================================================= */
+const nav = [
+  {group:"Overview", items:[
+    {id:"dashboard", label:"Executive Dashboard", icon:'<rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/>'},
+  ]},
+  {group:"Data Management", items:[
+    {id:"enterprises", label:"Enterprise Registry", icon:'<path d="M3 21V7l9-4 9 4v14"/><path d="M9 21v-8h6v8"/>'},
+    {id:"collection", label:"Data Collection", icon:'<path d="M9 2h6v4H9z"/><path d="M4 6h16v16H4z"/><path d="M8 13h8M8 17h5"/>'},
+    {id:"review", label:"Review & Approval", icon:'<path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/>', badge:42},
+  ]},
+  {group:"Analytics & GIS", items:[
+    {id:"gis", label:"GIS & Maps", icon:'<path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4z"/><path d="M8 2v16M16 6v16"/>'},
+    {id:"analytics", label:"Analytics Dashboards", icon:'<path d="M3 3v18h18"/><path d="M7 15l4-6 3 3 5-7"/>'},
+    {id:"reports", label:"Reports", icon:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>'},
+    {id:"benchmark", label:"Benchmark", icon:'<path d="M18 20V10M12 20V4M6 20v-6"/>'},
+  ]},
+  {group:"Market", items:[
+    {id:"linkage", label:"Linkage & Opportunities", icon:'<circle cx="7" cy="7" r="3"/><circle cx="17" cy="17" r="3"/><path d="M9.5 9.5l5 5"/>'},
+    {id:"notifications", label:"Notifications", icon:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>', badge:3},
+  ]},
+  {group:"Administration", items:[
+    {id:"users", label:"Users & Access", icon:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'},
+    {id:"audit", label:"Audit Log", icon:'<path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/>'},
+    {id:"config", label:"Configuration", icon:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.6 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.6 1z"/>'},
+  ]},
+];
+const pageMeta = {
+  dashboard:["Executive Dashboard","National overview · updated hourly"],
+  enterprises:["Enterprise Registry","12,480 enterprises across 11 regions and 2 city administrations"],
+  collection:["Data Collection","Manage campaigns, forms and questionnaires"],
+  review:["Review & Approval","Multi-level verification workflow"],
+  gis:["GIS & Spatial Reporting","Geographic distribution of manufacturing enterprises"],
+  analytics:["Industry Analysis Dashboards","Interactive indicators with drill-down"],
+  reports:["Statistical & Non-Statistical Reporting","Report catalogue and builder"],
+  benchmark:["Benchmark & International Data","Comparison against peer countries"],
+  linkage:["B2B Linkage & Market Opportunities","Buyers, suppliers, investors and partners"],
+  notifications:["Notifications","System and workflow alerts"],
+  users:["Users & Access","Role-based access control"],
+  audit:["Audit Log","Login, action and data-change history"],
+  config:["Configuration & Master Data","System parameters and reference data"],
+};
+
+const navScroll = document.getElementById("navScroll");
+navScroll.innerHTML = nav.map(g=>`
+  <div class="nav-group">
+    <div class="nav-group-label">${g.group}</div>
+    ${g.items.map(it=>`<a class="nav-item" data-id="${it.id}" href="#${it.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${it.icon}</svg><span>${it.label}</span>${it.badge?`<span class="badge">${it.badge}</span>`:""}</a>`).join("")}
+  </div>`).join("");
+
+/* Hash-based routing: clicking a link changes the URL (like a real page
+   redirect) while keeping everything in a single HTML file. Back/forward
+   browser buttons also work. */
+function goPage(id){
+  if(!document.getElementById("page-"+id)){ id = "dashboard"; }
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById("page-"+id).classList.add("active");
+  document.querySelectorAll(".nav-item").forEach(n=>n.classList.toggle("active", n.dataset.id===id));
+  document.getElementById("pageTitle").textContent = pageMeta[id][0];
+  document.getElementById("pageSub").textContent = pageMeta[id][1];
+  window.scrollTo(0,0);
+}
+function routeFromHash(){
+  const id = (location.hash || "#dashboard").replace("#","") || "dashboard";
+  goPage(id);
+}
+window.addEventListener("hashchange", routeFromHash);
+routeFromHash();
+
+function switchTab(el, page){
+  const parent = el.parentElement;
+  parent.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  el.classList.add("active");
+  const panes = parent.parentElement.querySelectorAll(".tabpane");
+  panes.forEach(p=> p.style.display = (p.dataset.p===el.dataset.t) ? "block" : "none");
+}
+
+const roleLabels = {federal:"Federal Administrator", regional:"Regional Data Officer", woreda:"Woreda Officer", analyst:"Policy Analyst", enterprise:"Enterprise Manager"};
+function setRole(v){ document.getElementById("userRoleLabel").textContent = roleLabels[v]; }
+
+/* =================================================================
+   CHARTS
+================================================================= */
+Chart.defaults.font.family = "Inter, sans-serif";
+Chart.defaults.color = "#667785";
+Chart.defaults.plugins.legend.labels.boxWidth = 12;
+Chart.defaults.plugins.legend.labels.font = {size:11.5};
+
+new Chart(document.getElementById("chGrowth"), {
+  type:"line",
+  data:{labels:["Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr","May","Jun","Jul"],
+    datasets:[
+      {label:"Registered", data:[11020,11180,11340,11480,11620,11780,11910,12040,12160,12270,12380,12480], borderColor:"#075985", backgroundColor:"rgba(7,89,133,.08)", tension:.35, fill:true},
+      {label:"Verified", data:[9800,10020,10260,10480,10700,10920,11150,11360,11540,11700,11860,12010], borderColor:"#087F8C", backgroundColor:"rgba(8,127,140,.08)", tension:.35, fill:true},
+    ]},
+  options:{maintainAspectRatio:false, plugins:{legend:{position:"top", align:"end"}}, scales:{y:{grid:{color:"#EEF2F5"}}, x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById("chSector"), {
+  type:"doughnut",
+  data:{labels:["Food & Beverage","Textile & Garment","Leather & Footwear","Chemicals","Metal & Engineering","Other"],
+    datasets:[{data:[28,22,14,12,15,9], backgroundColor:["#075985","#087F8C","#F4B41A","#1976B9","#27864B","#D7E0E7"], borderWidth:2, borderColor:"#fff"}]},
+  options:{maintainAspectRatio:false, cutout:"62%", plugins:{legend:{position:"right"}}}
+});
+
+new Chart(document.getElementById("chRegion"), {
+  type:"bar",
+  data:{labels:["Addis Ababa","Oromia","Amhara","Tigray","SNNPR","Sidama","Dire Dawa"],
+    datasets:[
+      {label:"Employment index", data:[128,112,104,84,98,90,76], backgroundColor:"#075985", borderRadius:4},
+      {label:"Production index", data:[121,118,109,79,102,94,81], backgroundColor:"#F4B41A", borderRadius:4},
+    ]},
+  options:{maintainAspectRatio:false, plugins:{legend:{position:"top", align:"end"}}, scales:{y:{grid:{color:"#EEF2F5"}}, x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById("chQuality"), {
+  type:"radar",
+  data:{labels:["Completeness","Uniqueness","Consistency","Accuracy","Timeliness","Validity"],
+    datasets:[{label:"Score", data:[92,88,81,86,74,90], backgroundColor:"rgba(8,127,140,.18)", borderColor:"#087F8C", pointBackgroundColor:"#087F8C"}]},
+  options:{maintainAspectRatio:false, scales:{r:{grid:{color:"#EEF2F5"}, angleLines:{color:"#EEF2F5"}, min:0, max:100, ticks:{display:false}}}, plugins:{legend:{display:false}}}
+});
+
+new Chart(document.getElementById("chProdSales"), {
+  type:"line",
+  data:{labels:["Q3'25","Q4'25","Q1'26","Q2'26"],
+    datasets:[
+      {label:"Production", data:[142,148,151,159], borderColor:"#075985", backgroundColor:"rgba(7,89,133,.1)", fill:true, tension:.3},
+      {label:"Sales", data:[131,139,143,151], borderColor:"#F4B41A", backgroundColor:"rgba(244,180,26,.12)", fill:true, tension:.3},
+    ]},
+  options:{maintainAspectRatio:false, plugins:{legend:{position:"top", align:"end"}}, scales:{y:{grid:{color:"#EEF2F5"}}, x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById("chGender"), {
+  type:"bar",
+  data:{labels:["Addis Ababa","Oromia","Amhara","Tigray","SNNPR"],
+    datasets:[
+      {label:"Female", data:[52,48,45,41,47], backgroundColor:"#087F8C", stack:"s"},
+      {label:"Male", data:[48,52,55,59,53], backgroundColor:"#DDF3F4", stack:"s"},
+    ]},
+  options:{maintainAspectRatio:false, indexAxis:"y", plugins:{legend:{position:"top", align:"end"}}, scales:{x:{stacked:true, grid:{color:"#EEF2F5"}}, y:{stacked:true, grid:{display:false}}}}
+});
+
+new Chart(document.getElementById("chConstraints"), {
+  type:"bar",
+  data:{labels:["Access to finance","Foreign currency","Market access","Raw materials","Power supply","Logistics","Skilled labor"],
+    datasets:[{data:[68,61,54,49,44,38,31], backgroundColor:"#C93C37", borderRadius:4}]},
+  options:{indexAxis:"y", maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{grid:{color:"#EEF2F5"}}, y:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById("chIct"), {
+  type:"bar",
+  data:{labels:["Internet access","Computer use","Accounting software","ERP system","E-commerce","Digital payments"],
+    datasets:[{data:[81,64,47,22,29,53], backgroundColor:"#1976B9", borderRadius:4}]},
+  options:{maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{grid:{color:"#EEF2F5"}, max:100}, x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById("chBenchProd"), {
+  type:"bar",
+  data:{labels:["Ethiopia","Kenya","Vietnam","Bangladesh","SSA avg."],
+    datasets:[{data:[4120,5480,9210,6870,5210], backgroundColor:["#075985","#D7E0E7","#D7E0E7","#D7E0E7","#D7E0E7"], borderRadius:4}]},
+  options:{maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{grid:{color:"#EEF2F5"}}, x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById("chBenchExp"), {
+  type:"bar",
+  data:{labels:["Ethiopia","Kenya","Vietnam","Bangladesh","SSA avg."],
+    datasets:[{data:[18.2,24.6,41.3,36.8,26.1], backgroundColor:["#F4B41A","#D7E0E7","#D7E0E7","#D7E0E7","#D7E0E7"], borderRadius:4}]},
+  options:{maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{grid:{color:"#EEF2F5"}}, x:{grid:{display:false}}}}
+});
+
+/* Map */
+const map = L.map('map', {scrollWheelZoom:false}).setView([9.02, 38.75], 6.4);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap contributors', maxZoom:18}).addTo(map);
+const mapPoints = [
+  [8.9806,38.7578,"Bole Lemi Garments PLC","Textile & Garment · Medium"],
+  [8.5400,39.2700,"Adama Agro Processing","Food & Beverage · Large"],
+  [13.4967,39.4753,"Mekelle Metal Works","Metal & Engineering · Small"],
+  [7.0500,38.4667,"Hawassa Leather Products","Leather & Footwear · Medium"],
+  [11.5931,37.3906,"Bahir Dar Textiles PLC","Textile & Garment · Large"],
+  [9.5931,41.8661,"Dire Dawa Chemical Industries","Chemicals · Medium"],
+  [12.6030,37.4521,"Gondar Food Complex","Food & Beverage · Small"],
+  [7.6667,36.8333,"Jimma Coffee Processors","Food & Beverage · Medium"],
+];
+const primaryIcon = L.divIcon({html:'<div style="width:14px;height:14px;border-radius:50%;background:#075985;border:2.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3)"></div>', className:'', iconSize:[14,14]});
+mapPoints.forEach(p=>{
+  L.marker([p[0],p[1]], {icon:primaryIcon}).addTo(map).bindPopup(`<strong>${p[2]}</strong><br>${p[3]}`);
+});
+</script>
+</body>
+</html>

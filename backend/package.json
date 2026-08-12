@@ -6,8 +6,8 @@
   "description": "Manufacturing Business Information System - API server",
   "main": "src/server.js",
   "scripts": {
-    "dev": "nodemon src/server.js",
-    "start": "node src/server.js"
+    "dev": "node init && nodemon src/server.js",
+    "start": "node init && node src/server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

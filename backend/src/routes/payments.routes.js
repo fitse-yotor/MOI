@@ -63,7 +63,7 @@ router.post("/:id/telebirr/confirm", loadContext, requireCanPay, (req, res, next
     return next(err);
   }
   const telebirrRef = `TLB${Date.now().toString().slice(-10)}`;
-  const result = confirmPayment(req.payment, req.license, req.template, { phone, telebirrRef });
+  const result = confirmPayment(req.payment, req.license, { phone, telebirrRef });
   res.json(result);
 });
 
