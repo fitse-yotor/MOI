@@ -4,8 +4,6 @@ import NavIcon from "./NavIcon.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import NotificationBell from "../notifications/NotificationBell.jsx";
 
-// CRUD sub-routes (e.g. /enterprises/:id/edit) fall back to their section's
-// title rather than defaulting to the dashboard, which would be misleading.
 function resolveMeta(pathname) {
   if (PAGE_META[pathname]) return PAGE_META[pathname];
   const match = Object.keys(PAGE_META)
@@ -14,7 +12,7 @@ function resolveMeta(pathname) {
   return PAGE_META[match] || PAGE_META["/"];
 }
 
-export default function Topbar({ onMenuClick }) {
+export default function Topbar({ onMenuClick, collapsed, onToggleCollapse }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -28,14 +26,29 @@ export default function Topbar({ onMenuClick }) {
   return (
     <div className="topbar">
       <div className="topbar-left">
+        {/* Mobile menu drawer button */}
         <button className="icon-btn menu-btn" onClick={onMenuClick} aria-label="Open menu">
           <NavIcon name="menu" size={18} />
         </button>
+
+        {/* Desktop horizontal sidebar collapse toggle */}
+        <button
+          className="icon-btn collapse-btn"
+          onClick={onToggleCollapse}
+          title={collapsed ? "Expand sidebar (Ctrl+B)" : "Collapse sidebar (Ctrl+B)"}
+          style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+        >
+          <span style={{ fontSize: 14, fontWeight: 800, color: "var(--text2)", lineHeight: 1 }}>
+            {collapsed ? "»" : "«"}
+          </span>
+        </button>
+
         <div>
           <div className="page-title">{title}</div>
           <div className="page-sub">{subtitle}</div>
         </div>
       </div>
+
       <div className="topbar-right">
         <div className="search-box">
           <NavIcon name="search" size={15} />

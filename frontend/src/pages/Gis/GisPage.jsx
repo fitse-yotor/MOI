@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -88,6 +89,13 @@ function SelectedDetail({ selected, infra }) {
           <div className="flexbtw"><span className="muted">Capacity Utilization</span><span className="mono">{item.capacityUtilization}%</span></div>
           <div className="flexbtw"><span className="muted">Export Status</span><Badge>{item.exportStatus}</Badge></div>
         </div>
+        <Link
+          to={`/site/${item.slug}`}
+          className="btn btn-primary btn-sm"
+          style={{ width: "100%", justifyContent: "center", marginTop: 12, textDecoration: "none" }}
+        >
+          Open Enterprise Site ↗
+        </Link>
       </div>
     );
   }
@@ -259,7 +267,12 @@ export default function GisPage() {
                   <TileLayer attribution="© OpenStreetMap contributors" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                   {mode === "industry" && indData?.items?.map((p) => (
                     <Marker key={`ind-${p.id}`} position={[p.lat, p.lng]} icon={industryIcon} eventHandlers={{ click: () => setSelected({ type: "industry", item: p }) }}>
-                      <Popup><strong>{p.name}</strong><br />{p.sector} · {p.size}<br />{p.region}</Popup>
+                      <Popup>
+                        <strong>{p.name}</strong><br />{p.sector} · {p.size}<br />{p.region}<br />
+                        <Link to={`/site/${p.slug}`} style={{ color: "#0284c7", fontWeight: 700, fontSize: 11, marginTop: 4, display: "inline-block" }}>
+                          Open Site ↗
+                        </Link>
+                      </Popup>
                     </Marker>
                   ))}
                   {mode === "infrastructure" && visibleInfra.map((p) => (
@@ -341,7 +354,12 @@ export default function GisPage() {
                   {/* Industry enterprise markers (filtered by region + sector) */}
                   {matchMarkers.map((p) => (
                     <Marker key={`mind-${p.id}`} position={[p.lat, p.lng]} icon={industryIcon} eventHandlers={{ click: () => setSelected({ type: "industry", item: p }) }}>
-                      <Popup><strong>{p.name}</strong><br />{p.sector} · {p.size}<br />{p.region}</Popup>
+                      <Popup>
+                        <strong>{p.name}</strong><br />{p.sector} · {p.size}<br />{p.region}<br />
+                        <Link to={`/site/${p.slug}`} style={{ color: "#0284c7", fontWeight: 700, fontSize: 11, marginTop: 4, display: "inline-block" }}>
+                          Open Site ↗
+                        </Link>
+                      </Popup>
                     </Marker>
                   ))}
 

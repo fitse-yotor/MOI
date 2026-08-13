@@ -1,27 +1,56 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { api } from "../../api/client.js";
 import { useSnackbar } from "../../context/SnackbarContext.jsx";
+import MarkdownMessage from "../../components/chat/MarkdownMessage.jsx";
 
 const QUICK_ACTIONS = [
-  { label: "National Policy Memo", desc: "Executive policy brief on sector growth", query: "Generate official executive policy brief for the Minister of Industry on manufacturing sector growth" },
-  { label: "FDI Site Selection", desc: "Optimal location for $50M foreign investment", query: "Recommend optimal investment site for a $50M foreign direct investment in textile manufacturing" },
+  { label: "National Policy Memo", desc: "Executive policy brief on sector growth & targets", query: "Generate official executive policy brief for the Minister of Industry on manufacturing sector growth" },
+  { label: "FDI Site Selection", desc: "Optimal location model for $50M investment", query: "Recommend optimal investment site for a $50M foreign direct investment in textile manufacturing" },
   { label: "Import Substitution", desc: "Forex savings model for chemical & food", query: "Simulate import substitution forex savings for industrial chemicals and food processing sectors" },
-  { label: "Infrastructure Bottlenecks", desc: "Energy & transport corridor analysis", query: "Analyze energy grid and logistics bottlenecks in Oromia and Amhara for industrial development" },
+  { label: "Infrastructure Bottlenecks", desc: "Energy & transport corridor readiness audit", query: "Analyze energy grid and logistics bottlenecks in Oromia and Amhara for industrial development" },
 ];
 
+const MINISTER_STORAGE_KEY = "minister_chat_history_v1";
+
 export default function MinisterChatPage() {
-  const [messages, setMessages] = useState([]);
+  const loadHistory = useCallback(() => {
+    try {
+      const raw = localStorage.getItem(MINISTER_STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  }, []);
+
+  const [messages, setMessages] = useState(loadHistory);
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
   const [sessionId] = useState(() => `EXEC-${Date.now().toString(36).toUpperCase()}`);
   const [focused, setFocused] = useState(false);
+  const [copiedIdx, setCopiedIdx] = useState(null);
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
   const { notify } = useSnackbar();
 
+  /* Persist messages */
+  useEffect(() => {
+    try {
+      const toSave = messages.slice(-60).map((m) => ({ from: m.from, text: m.text, payload: m.payload, suggestions: m.suggestions }));
+      localStorage.setItem(MINISTER_STORAGE_KEY, JSON.stringify(toSave));
+    } catch {
+      /* ignore */
+    }
+  }, [messages]);
+
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, pending]);
+
+  function clearSession() {
+    setMessages([]);
+    localStorage.removeItem(MINISTER_STORAGE_KEY);
+    notify("Decision session reset", "info");
+  }
 
   async function ask(queryText) {
     const text = (queryText || input || "").trim();
@@ -40,9 +69,11 @@ export default function MinisterChatPage() {
     }
   }
 
-  function copyToClipboard(text) {
+  function handleCopyMemo(text, idx) {
     navigator.clipboard.writeText(text);
+    setCopiedIdx(idx);
     notify("Executive memo copied to clipboard", "success");
+    setTimeout(() => setCopiedIdx(null), 2000);
   }
 
   const now = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
@@ -52,7 +83,7 @@ export default function MinisterChatPage() {
 
       {/* ── Executive Masthead ── */}
       <div style={{
-        background: "linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)",
+        background: "linear-gradient(135deg, var(--primary-dark) 0%, #0d2b3f 60%, var(--primary-dark) 100%)",
         color: "#fff",
         borderRadius: "var(--radius-lg)",
         padding: "24px 28px",
@@ -94,7 +125,7 @@ export default function MinisterChatPage() {
         </div>
       </div>
 
-      {/* ── Quick Action Tiles ── */}
+      {/* ── Quick Action Scenario Tiles ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 10 }}>
         {QUICK_ACTIONS.map((a) => (
           <button
@@ -133,7 +164,7 @@ export default function MinisterChatPage() {
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <span className="badge muted">Restricted Access</span>
             {messages.length > 0 && (
-              <button type="button" className="btn btn-outline btn-sm" onClick={() => setMessages([])}>
+              <button type="button" className="btn btn-outline btn-sm" onClick={clearSession}>
                 Clear Session
               </button>
             )}
@@ -141,13 +172,13 @@ export default function MinisterChatPage() {
         </div>
 
         {/* Messages */}
-        <div ref={scrollRef} style={{ minHeight: 400, maxHeight: 520, overflowY: "auto", padding: "18px 20px", display: "flex", flexDirection: "column", gap: 14, background: "var(--bg)" }}>
+        <div ref={scrollRef} style={{ minHeight: 400, maxHeight: 540, overflowY: "auto", padding: "20px 22px", display: "flex", flexDirection: "column", gap: 16, background: "var(--bg)" }}>
 
           {/* Welcome */}
           {messages.length === 0 && (
-            <div style={{ flex: 1, textAlign: "center", padding: "28px 20px", background: "var(--card)", borderRadius: "var(--radius)", border: "1px dashed var(--border)" }}>
+            <div style={{ flex: 1, textAlign: "center", padding: "32px 20px", background: "var(--card)", borderRadius: "var(--radius)", border: "1px dashed var(--border)" }}>
               <div style={{ fontWeight: 800, fontSize: 16, color: "var(--primary-dark)", marginBottom: 6 }}>Ministerial Decision Support Console</div>
-              <div style={{ fontSize: 13, color: "var(--text2)", maxWidth: 500, margin: "0 auto 18px", lineHeight: 1.6 }}>
+              <div style={{ fontSize: 13, color: "var(--text2)", maxWidth: 520, margin: "0 auto 18px", lineHeight: 1.6 }}>
                 Select a scenario brief tile above or enter a policy directive to simulate investment suitability, evaluate infrastructure readiness, or generate executive briefs.
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center" }}>
@@ -166,32 +197,30 @@ export default function MinisterChatPage() {
 
           {/* Message History */}
           {messages.map((m, i) => (
-            <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: m.from === "user" ? "flex-end" : "flex-start", gap: 3 }}>
+            <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: m.from === "user" ? "flex-end" : "flex-start", gap: 4 }}>
               <div style={{ fontSize: 10.5, color: "var(--text2)", fontWeight: 700, padding: m.from === "user" ? "0 4px 0 0" : "0 0 0 4px" }}>
                 {m.from === "user" ? "Executive Directive" : "Executive Intelligence Briefing"}
               </div>
 
               {m.from === "user" ? (
-                <div style={{ maxWidth: "70%", padding: "10px 15px", background: "var(--primary-dark)", color: "#fff", borderRadius: "14px 14px 3px 14px", fontSize: 13, lineHeight: 1.6, fontWeight: 500, boxShadow: "var(--shadow-xs)", wordBreak: "break-word" }}>
+                <div style={{ maxWidth: "72%", padding: "11px 16px", background: "var(--primary-dark)", color: "#fff", borderRadius: "14px 14px 3px 14px", fontSize: 13, lineHeight: 1.6, fontWeight: 500, boxShadow: "var(--shadow-xs)", wordBreak: "break-word" }}>
                   {m.text}
                 </div>
               ) : (
-                <div style={{ width: "100%", background: "var(--card)", border: "1px solid var(--border)", borderRadius: "3px 14px 14px 14px", padding: "16px 18px", boxShadow: "var(--shadow-xs)" }}>
+                <div style={{ width: "100%", background: "var(--card)", border: "1px solid var(--border)", borderRadius: "3px 14px 14px 14px", padding: "18px 20px", boxShadow: "var(--shadow-xs)" }}>
                   {/* Header */}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, paddingBottom: 10, borderBottom: "1px solid var(--border)" }}>
                     <div>
                       <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--primary-dark)" }}>Executive Decision Memo</div>
                       <div style={{ fontSize: 10.5, color: "var(--text2)" }}>FDRE Ministry of Industry Analytics Unit</div>
                     </div>
-                    <button type="button" className="btn btn-outline btn-sm" onClick={() => copyToClipboard(m.text)}>
-                      Copy Memo
+                    <button type="button" className="btn btn-outline btn-sm" onClick={() => handleCopyMemo(m.text, i)}>
+                      {copiedIdx === i ? "✓ Copied" : "Copy Memo"}
                     </button>
                   </div>
 
                   {/* Body */}
-                  <div style={{ fontSize: 13.5, color: "var(--text)", lineHeight: 1.7, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-                    {m.text}
-                  </div>
+                  <MarkdownMessage text={m.text} />
 
                   {/* KPIs */}
                   {m.payload?.kpis && (
@@ -212,7 +241,7 @@ export default function MinisterChatPage() {
 
                   {/* Follow-ups */}
                   {m.suggestions?.length > 0 && (
-                    <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid var(--border)", display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
+                    <div style={{ marginTop: 14, paddingTop: 10, borderTop: "1px solid var(--border)", display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
                       <span style={{ fontSize: 10.5, color: "var(--text2)", fontWeight: 700 }}>Follow-up:</span>
                       {m.suggestions.map((s) => (
                         <button key={s} type="button" onClick={() => ask(s)} className="btn btn-outline btn-sm" style={{ borderRadius: 20, fontSize: 11.5, padding: "3px 10px" }}>
@@ -228,23 +257,23 @@ export default function MinisterChatPage() {
 
           {/* Pending Indicator */}
           {pending && (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 3 }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 4 }}>
               <div style={{ fontSize: 10.5, color: "var(--text2)", fontWeight: 700, paddingLeft: 4 }}>Executive Intelligence Briefing</div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 14px", background: "var(--card)", border: "1px solid var(--border)", borderRadius: "3px 12px 12px 12px", boxShadow: "var(--shadow-xs)" }}>
-                <span style={{ fontSize: 11.5, color: "var(--text2)", fontStyle: "italic" }}>Evaluating spatial data &amp; compiling executive brief…</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "12px 16px", background: "var(--card)", border: "1px solid var(--border)", borderRadius: "3px 12px 12px 12px", boxShadow: "var(--shadow-xs)" }}>
+                <span style={{ fontSize: 12, color: "var(--text2)", fontStyle: "italic" }}>Evaluating spatial data &amp; compiling executive brief…</span>
               </div>
             </div>
           )}
         </div>
 
         {/* Input Bar */}
-        <div style={{ padding: "10px 16px", borderTop: "1px solid var(--border)", background: "var(--card)", display: "flex", gap: 8, alignItems: "center" }}>
+        <div style={{ padding: "12px 18px", borderTop: "1px solid var(--border)", background: "var(--card)", display: "flex", gap: 8, alignItems: "center" }}>
           <div style={{
             flex: 1, display: "flex", alignItems: "center",
             background: "var(--bg)",
             border: `1px solid ${focused ? "var(--primary)" : "var(--border)"}`,
             borderRadius: "var(--radius)",
-            padding: "0 12px",
+            padding: "0 14px",
             transition: "border-color 0.15s",
             boxShadow: focused ? "0 0 0 3px rgba(15,23,42,0.06)" : "none",
           }}>
@@ -256,7 +285,7 @@ export default function MinisterChatPage() {
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               placeholder="Enter executive directive or policy question..."
-              style={{ flex: 1, padding: "10px 0", background: "transparent", border: "none", outline: "none", fontSize: 13, color: "var(--text)", fontFamily: "inherit" }}
+              style={{ flex: 1, padding: "11px 0", background: "transparent", border: "none", outline: "none", fontSize: 13, color: "var(--text)", fontFamily: "inherit" }}
             />
           </div>
           <button
@@ -264,7 +293,7 @@ export default function MinisterChatPage() {
             className="btn btn-primary"
             onClick={() => ask()}
             disabled={pending || !input.trim()}
-            style={{ height: 38, padding: "0 18px", fontSize: 12.5, fontWeight: 700 }}
+            style={{ height: 40, padding: "0 20px", fontSize: 12.5, fontWeight: 700 }}
           >
             {pending ? "Analyzing…" : "Generate Brief"}
           </button>

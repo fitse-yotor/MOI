@@ -1,4 +1,3 @@
-import { useState } from "react";
 import ChatPanel from "../../components/chat/ChatPanel.jsx";
 
 const FEATURES = [
@@ -10,14 +9,12 @@ const FEATURES = [
 ];
 
 export default function ChatPage() {
-  const [cleared, setCleared] = useState(0);
-
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
       {/* ── Executive Header Banner ── */}
       <div style={{
-        background: "linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)",
+        background: "linear-gradient(135deg, var(--primary-dark) 0%, #0d2b3f 60%, var(--primary-dark) 100%)",
         borderRadius: "var(--radius-lg)",
         padding: "24px 28px",
         color: "#fff",
@@ -104,17 +101,10 @@ export default function ChatPage() {
             <span className="card-title" style={{ margin: 0, fontSize: 13.5 }}>Intelligence Console</span>
             <span className="badge info">Automated AI</span>
           </div>
-          <button
-            type="button"
-            className="btn btn-outline btn-sm"
-            onClick={() => setCleared((c) => c + 1)}
-          >
-            Reset Session
-          </button>
         </div>
 
-        {/* ChatPanel */}
-        <ChatPanel key={cleared} endpoint="/chat" />
+        {/* ChatPanel — storageKey enables persistent history across sessions */}
+        <ChatPanel endpoint="/chat" storageKey="ai_assistant" />
       </div>
     </div>
   );

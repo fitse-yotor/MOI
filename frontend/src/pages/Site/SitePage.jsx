@@ -15,6 +15,22 @@ const pinIcon = L.divIcon({
   iconSize: [16, 16],
 });
 
+/* ── Sector → product image keyword map (Unsplash) ── */
+const SECTOR_IMG = {
+  "Textile & Garment": ["textile-factory", "garment-fabric", "apparel-manufacturing"],
+  "Food & Beverage": ["grain-mill", "food-processing", "ethiopian-food"],
+  "Leather & Footwear": ["leather-workshop", "leather-shoe", "tannery"],
+  "Metal & Engineering": ["steel-fabrication", "metal-workshop", "industrial-metal"],
+  "Chemicals": ["chemical-plant", "industrial-chemistry", "laboratory"],
+  "default": ["manufacturing-factory", "industrial-production", "factory"],
+};
+
+function productImage(sector, idx) {
+  const keywords = SECTOR_IMG[sector] || SECTOR_IMG["default"];
+  const kw = keywords[idx % keywords.length];
+  return `https://source.unsplash.com/400x260/?${encodeURIComponent(kw)}&sig=${idx + 1}`;
+}
+
 function Stat({ label, value }) {
   return (
     <div className="site-stat">
@@ -40,9 +56,7 @@ export default function SitePage() {
       .then((res) => alive && setData(res))
       .catch((err) => alive && setError(err.message || "Failed to load profile"))
       .finally(() => alive && setLoading(false));
-    return () => {
-      alive = false;
-    };
+    return () => { alive = false; };
   }, [slug, retry]);
 
   const e = data?.item;
@@ -96,10 +110,29 @@ export default function SitePage() {
                   <h2>Products</h2>
                 </div>
                 <div className="site-products">
-                  {(e.products && e.products.length ? e.products : [{ name: "Products coming soon", description: "This enterprise's product catalogue is being prepared." }]).map((p) => (
+                  {(e.products && e.products.length
+                    ? e.products
+                    : [{ name: "Products coming soon", description: "This enterprise's product catalogue is being prepared." }]
+                  ).map((p, idx) => (
                     <div className="site-product" key={p.name}>
-                      <h3>{p.name}</h3>
-                      <p>{p.description}</p>
+                      {/* Product image — uses Unsplash with sector keyword */}
+                      <img
+                        src={productImage(e.sector, idx)}
+                        alt={p.name}
+                        className="site-product-img"
+                        loading="lazy"
+                        onError={(ev) => {
+                          ev.target.style.display = "none";
+                          ev.target.nextSibling.style.display = "flex";
+                        }}
+                      />
+                      <div className="site-product-img-placeholder" style={{ display: "none" }}>
+                        🏭
+                      </div>
+                      <div className="site-product-body">
+                        <h3>{p.name}</h3>
+                        <p>{p.description}</p>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -152,7 +185,7 @@ export default function SitePage() {
                   ) : (
                     <CertificatePreview
                       templateName="National Manufacturing Registration Certificate"
-                      category="Official Operating Registry Record"
+                      category="Official Operating Record"
                       licenseNumber={`REG-MOI-${e.establishedYear}-${e.id}`}
                       enterpriseName={e.name}
                       issueDate={`${e.establishedYear}-01-10`}
@@ -173,7 +206,8 @@ export default function SitePage() {
               <span className="site-footer-right">Generated public profile · {e.name}</span>
             </footer>
 
-            <ChatWidget context={{ enterpriseSlug: slug }} />
+            {/* ── Floating Chat Launcher ── */}
+            <ChatWidget context={{ enterpriseSlug: slug }} enterpriseName={e.name} />
           </>
         )}
       </DataState>
