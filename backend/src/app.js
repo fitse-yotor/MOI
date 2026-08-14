@@ -4,6 +4,7 @@ import morgan from "morgan";
 import apiRoutes from "./routes/index.js";
 import authRoutes from "./routes/auth.routes.js";
 import publicRoutes from "./routes/public.routes.js";
+import integrationDemoRoutes from "./routes/integration.public.routes.js";
 import { notFound } from "./middleware/notFound.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { authenticate } from "./middleware/auth.js";
@@ -18,6 +19,8 @@ export function createApp() {
   app.get("/health", (req, res) => res.json({ status: "ok" }));
   app.use("/api/auth", authRoutes);
   app.use("/api/public", publicRoutes);
+  // Public demo endpoints — no auth required (mock APIs & sample file downloads)
+  app.use("/api/integrations", integrationDemoRoutes);
   app.use("/api", authenticate, apiRoutes);
 
   app.use(notFound);

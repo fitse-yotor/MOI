@@ -9,6 +9,7 @@ export const NAV_GROUPS = [
       { id: "enterprises", path: "/enterprises", label: "Enterprise Registry", icon: "enterprises" },
       { id: "collection", path: "/collection", label: "Data Collection", icon: "collection" },
       { id: "review", path: "/review", label: "Review & Approval", icon: "review", badge: 42 },
+      { id: "integrations", path: "/integrations", label: "Data Integrations", icon: "config" },
     ],
   },
   {
@@ -69,6 +70,7 @@ export const PAGE_META = {
   "/users": ["Users & Access", "Role-based access control"],
   "/audit": ["Audit Log", "Login, action and data-change history"],
   "/config": ["Configuration & Master Data", "System parameters and reference data"],
+  "/integrations": ["External Data Integration", "Connect REST APIs, datafiles (CSV/JSON), and external feeds"],
   "/chat": ["AI Assistant", "Ask about enterprises, infrastructure and market opportunities"],
   "/advisory": ["Minister's Advisory", "Decision-support analysis for ministry officials"],
 };

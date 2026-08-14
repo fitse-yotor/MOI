@@ -40,8 +40,24 @@ export default function BenchmarkPage() {
                 data={{ labels: data.exportShare.labels, datasets: [{ data: data.exportShare.values, backgroundColor: ["#F4B41A", "#D7E0E7", "#D7E0E7", "#D7E0E7", "#D7E0E7"], borderRadius: 4 }] }}
               />
             </div>
+
+            {data.fdiCountryBenchmark && (
+              <div style={{ marginTop: 18 }}>
+                <ChartCard
+                  title="FDI capital commitment by country of origin ($M USD)"
+                  subtitle="Source: Ethiopian Investment Commission FDI Gateway Integration"
+                  type="bar"
+                  options={{ plugins: { legend: { display: false } }, scales: { y: { grid: { color: "#EEF2F5" } } } }}
+                  data={{
+                    labels: data.fdiCountryBenchmark.labels,
+                    datasets: [{ data: data.fdiCountryBenchmark.values, backgroundColor: ["#0284c7", "#059669", "#7c3aed", "#d97706"], borderRadius: 4 }],
+                  }}
+                />
+              </div>
+            )}
+
             <Card style={{ marginTop: 18 }}>
-              <CardHead title="Gap analysis vs. peer average" />
+              <CardHead title="Gap analysis & integrated operational metrics vs. peer average" />
               <DataTable columns={gapColumns} rows={data.gapAnalysis} rowKey="indicator" />
             </Card>
           </>
@@ -50,3 +66,4 @@ export default function BenchmarkPage() {
     </>
   );
 }
+

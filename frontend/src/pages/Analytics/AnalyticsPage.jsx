@@ -54,9 +54,53 @@ export default function AnalyticsPage() {
                 data={{ labels: data.ictAdoption.labels, datasets: [{ data: data.ictAdoption.values, backgroundColor: "#1976B9", borderRadius: 4 }] }}
               />
             </div>
+
+            {/* ── External Integration Telemetry & Analytics ── */}
+            <div style={{ marginTop: 24, padding: "18px 20px", background: "#f0f9ff", borderRadius: 12, border: "1px solid #bae6fd" }}>
+              <div className="flexbtw" style={{ marginBottom: 16 }}>
+                <div>
+                  <h3 style={{ fontSize: 16, fontWeight: 800, color: "#0369a1", margin: 0 }}>
+                    ⚡ Cross-System Live Telemetry & Integration Analytics
+                  </h3>
+                  <small style={{ color: "#64748b" }}>
+                    Real-time aggregated analytics from EIC FDI Gateway, Customs CSV Feeds, and Ethio Telecom Fiber Ring
+                  </small>
+                </div>
+                <span className="badge success">Live Sync Active</span>
+              </div>
+
+              <div className="grid g2">
+                {data.fdiBySectorChart && (
+                  <ChartCard
+                    title="Approved FDI capital by sector ($M USD)"
+                    subtitle="Source: EIC Foreign Direct Investment Gateway"
+                    type="bar"
+                    options={{ plugins: { legend: { display: false } }, scales: { y: { grid: { color: "#e2e8f0" } } } }}
+                    data={{
+                      labels: data.fdiBySectorChart.labels,
+                      datasets: [{ data: data.fdiBySectorChart.values, backgroundColor: "#059669", borderRadius: 6 }],
+                    }}
+                  />
+                )}
+
+                {data.fiberCoverageChart && (
+                  <ChartCard
+                    title="Telecom fiber bandwidth by industrial park (Gbps)"
+                    subtitle="Source: Ethio Telecom GIS Infrastructure Feed"
+                    type="bar"
+                    options={{ plugins: { legend: { display: false } }, scales: { y: { grid: { color: "#e2e8f0" } } } }}
+                    data={{
+                      labels: data.fiberCoverageChart.labels,
+                      datasets: [{ data: data.fiberCoverageChart.values, backgroundColor: "#7c3aed", borderRadius: 6 }],
+                    }}
+                  />
+                )}
+              </div>
+            </div>
           </>
         )}
       </DataState>
     </>
   );
 }
+

@@ -91,12 +91,29 @@ export default function Sidebar({ open, collapsed, onToggleCollapse }) {
                       key={item.id}
                       to={item.path}
                       end={item.path === "/"}
-                      title={collapsed ? `${item.label} (${g.group})` : undefined}
+                      title={collapsed ? `${item.label}${item.badge ? ` (${item.badge} pending)` : ""}` : undefined}
                       className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
                     >
-                      <NavIcon name={item.icon} />
+                      <span style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+                        <NavIcon name={item.icon} />
+                        {collapsed && item.badge ? (
+                          <span
+                            style={{
+                              position: "absolute",
+                              top: -2,
+                              right: -4,
+                              width: 7,
+                              height: 7,
+                              borderRadius: "50%",
+                              background: "var(--accent)",
+                              boxShadow: "0 0 4px rgba(244, 180, 26, 0.6)",
+                              border: "1.5px solid #0d2b3f",
+                            }}
+                          />
+                        ) : null}
+                      </span>
                       {!collapsed && <span>{item.label}</span>}
-                      {item.badge ? <span className="badge">{item.badge}</span> : null}
+                      {!collapsed && item.badge ? <span className="badge">{item.badge}</span> : null}
                     </NavLink>
                   ))}
                 </div>

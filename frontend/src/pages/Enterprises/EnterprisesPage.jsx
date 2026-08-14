@@ -17,9 +17,14 @@ export default function EnterprisesPage() {
   const { notify } = useSnackbar();
   const [filters, setFilters] = useState({ q: "", region: "all", sector: "all", size: "all", status: "all" });
   const [deleting, setDeleting] = useState(null);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [registeringId, setRegisteringId] = useState(null);
+
   const query = buildQuery(filters);
   const { data, loading, error, refetch } = useApiGet(`/enterprises${query}`, { deps: [query] });
+  const { data: discoveredData, refetch: refetchDiscovered } = useApiGet("/integrations/discovered-enterprises");
   const del = useApiAction("del");
+  const { run: autoRegister } = useApiAction("post");
 
   const masterData = data?.filters || { regions: [], sectors: [], sizes: [], statuses: [] };
 
@@ -28,6 +33,20 @@ export default function EnterprisesPage() {
     notify(`${deleting.name} removed from the registry`, "success");
     setDeleting(null);
     refetch();
+  }
+
+  async function handleAutoRegister(item) {
+    setRegisteringId(item.id);
+    try {
+      const res = await autoRegister("/integrations/auto-register", item.rawPayload || item);
+      notify(`Auto-registered '${item.name}' into official Enterprise Registry!`, "success");
+      refetch();
+      refetchDiscovered();
+    } catch (err) {
+      notify(err.message || "Failed to auto-register enterprise", "error");
+    } finally {
+      setRegisteringId(null);
+    }
   }
 
   const columns = [
@@ -49,7 +68,7 @@ export default function EnterprisesPage() {
     { key: "region", label: "Region" },
     { key: "size", label: "Size" },
     { key: "employees", label: "Employees", render: (r) => <span className="mono">{r.employees}</span> },
-    { key: "status", label: "Status", render: (r) => <Badge>{r.status}</Badge> },
+    { key: "status", label: "Status", render: (r) => <Badge tone={r.status.startsWith("Integrated") ? "success" : r.status.includes("Integration") ? "info" : "default"}>{r.status}</Badge> },
     {
       key: "actions",
       label: "",
@@ -84,6 +103,9 @@ export default function EnterprisesPage() {
         onChange={(key, value) => setFilters((f) => ({ ...f, [key]: value }))}
         actions={
           <>
+            <Button variant="outline" size="sm" onClick={() => setIsImportModalOpen(true)}>
+              ⚡ Import from Integration ({discoveredData?.items?.length || 0})
+            </Button>
             <Button variant="outline" size="sm">Export list</Button>
             {can("enterprises", "create") && <Button size="sm" onClick={() => navigate("/enterprises/new")}>Register enterprise</Button>}
           </>
@@ -97,6 +119,58 @@ export default function EnterprisesPage() {
           {data && <DataTable columns={columns} rows={data.items} onRowClick={(r) => navigate(`/enterprises/${r.id}`)} />}
         </DataState>
       </Card>
+
+      {/* ── Modal: Import / Provision Enterprise from Integration Feed ── */}
+      {isImportModalOpen && (
+        <div className="overlay" style={{ alignItems: "center", justifyContent: "center", padding: 20 }}>
+          <div className="card" style={{ width: "100%", maxWidth: 680, boxShadow: "var(--shadow-lg)" }}>
+            <div className="flexbtw" style={{ marginBottom: 16 }}>
+              <div>
+                <h3 style={{ fontSize: 16, fontWeight: 800, color: "var(--primary-dark)", margin: 0 }}>
+                  ⚡ Auto-Register Unregistered Enterprises from Integration Feeds
+                </h3>
+                <small style={{ color: "var(--text2)" }}>
+                  Discovered from ERCA Tax API, EIC FDI Gateway, and Customs Export Feeds. Click 1-click Auto-Register to integrate into Registry without manual form entry.
+                </small>
+              </div>
+              <button type="button" onClick={() => setIsImportModalOpen(false)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "var(--text2)" }}>✕</button>
+            </div>
+
+            {discoveredData?.items?.length === 0 ? (
+              <div style={{ padding: 20, textAlign: "center", color: "var(--text2)" }}>
+                ✓ All discovered external enterprises have already been registered!
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, maxHeight: 380, overflowY: "auto" }}>
+                {(discoveredData?.items || []).map((item) => (
+                  <div key={item.id} style={{ padding: "12px 16px", background: "#f8fafc", borderRadius: 8, border: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: "var(--primary-dark)" }}>{item.name}</div>
+                      <div style={{ fontSize: 12, color: "var(--text2)" }}>
+                        TIN: <span style={{ fontFamily: "IBM Plex Mono, monospace" }}>{item.tin}</span> · {item.sector} ({item.region})
+                      </div>
+                      <div style={{ fontSize: 11, color: "var(--primary)", marginTop: 2 }}>{item.details}</div>
+                    </div>
+                    <Button
+                      variant="success"
+                      size="sm"
+                      onClick={() => handleAutoRegister(item)}
+                      disabled={registeringId === item.id}
+                    >
+                      {registeringId === item.id ? "Registering…" : "⚡ Auto-Register"}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
+              <Button variant="outline" onClick={() => setIsImportModalOpen(false)}>Done</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <ConfirmDialog
         open={!!deleting}
         title={deleting ? `Remove ${deleting.name}?` : ""}
@@ -107,3 +181,4 @@ export default function EnterprisesPage() {
     </>
   );
 }
+

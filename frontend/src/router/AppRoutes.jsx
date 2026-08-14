@@ -38,6 +38,7 @@ import UserViewPage from "../pages/Users/UserViewPage.jsx";
 
 import AuditPage from "../pages/Audit/AuditPage.jsx";
 import ConfigPage from "../pages/Config/ConfigPage.jsx";
+import IntegrationsPage from "../pages/Integrations/IntegrationsPage.jsx";
 
 import LicensesPage from "../pages/Licenses/LicensesPage.jsx";
 import LicenseIssuePage from "../pages/Licenses/LicenseIssuePage.jsx";
@@ -95,6 +96,7 @@ export default function AppRoutes() {
 
         <Route path="/audit" element={<AuditPage />} />
         <Route path="/config" element={<ConfigPage />} />
+        <Route path="/integrations" element={<IntegrationsPage />} />
 
         <Route path="/licenses" element={<LicensesPage />} />
         <Route path="/licenses/issue" element={<LicenseIssuePage />} />

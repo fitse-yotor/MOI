@@ -222,12 +222,64 @@ tbody tr:last-child td { border-bottom: none; }
 .telebirr-pin { letter-spacing: 10px; font-size: 18px; text-align: center; font-weight: 700; }
 
 /* ===== Public enterprise website (/site/:slug) ===== */
-.site-page { min-height: 100vh; background: #fff; color: #23333f; }
+.site-page { min-height: 100vh; background: var(--site-bg, #f0f7fb); color: #23333f; }
 .site-page * { box-sizing: border-box; }
-.site-theme-marine { --site-ink: #075985; --site-ink2: #064a70; --site-bg: #eef5fa; }
-.site-theme-forest { --site-ink: #1f6e43; --site-ink2: #175334; --site-bg: #eef7f1; }
-.site-theme-amber { --site-ink: #b8860b; --site-ink2: #8f6a07; --site-bg: #fdf6e9; }
-.site-topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; border-bottom: 1px solid var(--border); background: #fff; }
+
+.site-theme-marine {
+  --site-ink: #075985;
+  --site-ink2: #0369a1;
+  --site-bg: #f0f7fb;
+  --site-card-bg: #ffffff;
+  --site-border: #bae6fd;
+  --site-accent: #0284c7;
+}
+
+.site-theme-forest {
+  --site-ink: #166534;
+  --site-ink2: #14532d;
+  --site-bg: #f0fdf4;
+  --site-card-bg: #ffffff;
+  --site-border: #bbf7d0;
+  --site-accent: #16a34a;
+}
+
+.site-theme-amber {
+  --site-ink: #b45309;
+  --site-ink2: #78350f;
+  --site-bg: #fffbeb;
+  --site-card-bg: #ffffff;
+  --site-border: #fde68a;
+  --site-accent: #d97706;
+}
+
+.site-theme-slate {
+  --site-ink: #334155;
+  --site-ink2: #1e293b;
+  --site-bg: #f1f5f9;
+  --site-card-bg: #ffffff;
+  --site-border: #cbd5e1;
+  --site-accent: #475569;
+}
+
+.site-theme-gold {
+  --site-ink: #a16207;
+  --site-ink2: #713f12;
+  --site-bg: #fefce8;
+  --site-card-bg: #ffffff;
+  --site-border: #fef08a;
+  --site-accent: #ca8a04;
+}
+
+.site-theme-emerald {
+  --site-ink: #065f46;
+  --site-ink2: #064e3b;
+  --site-bg: #ecfdf5;
+  --site-card-bg: #ffffff;
+  --site-border: #a7f3d0;
+  --site-accent: #059669;
+}
+
+.site-topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; border-bottom: 1px solid var(--border); background: var(--site-card-bg, #fff); }
 .site-brand { display: flex; align-items: center; gap: 11px; font-weight: 800; font-size: 15px; }
 .site-brand img { width: 30px; height: 30px; }
 .site-brand em { display: block; font-style: normal; font-weight: 500; font-size: 10.5px; color: var(--text2); }

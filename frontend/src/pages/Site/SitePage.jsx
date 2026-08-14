@@ -15,21 +15,7 @@ const pinIcon = L.divIcon({
   iconSize: [16, 16],
 });
 
-/* ── Sector → product image keyword map (Unsplash) ── */
-const SECTOR_IMG = {
-  "Textile & Garment": ["textile-factory", "garment-fabric", "apparel-manufacturing"],
-  "Food & Beverage": ["grain-mill", "food-processing", "ethiopian-food"],
-  "Leather & Footwear": ["leather-workshop", "leather-shoe", "tannery"],
-  "Metal & Engineering": ["steel-fabrication", "metal-workshop", "industrial-metal"],
-  "Chemicals": ["chemical-plant", "industrial-chemistry", "laboratory"],
-  "default": ["manufacturing-factory", "industrial-production", "factory"],
-};
-
-function productImage(sector, idx) {
-  const keywords = SECTOR_IMG[sector] || SECTOR_IMG["default"];
-  const kw = keywords[idx % keywords.length];
-  return `https://source.unsplash.com/400x260/?${encodeURIComponent(kw)}&sig=${idx + 1}`;
-}
+import { getProductImage } from "../../config/productImages.js";
 
 function Stat({ label, value }) {
   return (
@@ -117,7 +103,7 @@ export default function SitePage() {
                     <div className="site-product" key={p.name}>
                       {/* Product image — uses Unsplash with sector keyword */}
                       <img
-                        src={productImage(e.sector, idx)}
+                        src={getProductImage(e.sector, idx)}
                         alt={p.name}
                         className="site-product-img"
                         loading="lazy"

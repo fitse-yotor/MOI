@@ -17,6 +17,7 @@ export const PERMISSIONS = {
     dashboard: FULL, enterprises: FULL, collection: FULL, review: FULL, gis: FULL,
     analytics: FULL, reports: FULL, linkage: FULL, benchmark: FULL, notifications: FULL,
     users: FULL, audit: VIEW, config: FULL, licenses: FULL, chat: VIEW, advisory: VIEW,
+    integrations: FULL,
   },
   regional: {
     dashboard: VIEW, enterprises: vc({ create: true, edit: true }), collection: VIEW,
@@ -24,24 +25,25 @@ export const PERMISSIONS = {
     reports: vc({ create: true }), linkage: vc({ create: true }), benchmark: VIEW,
     notifications: VIEW, users: NONE, audit: NONE, config: NONE,
     licenses: vc({ create: true, edit: true, approve: true }), chat: VIEW, advisory: VIEW,
+    integrations: VIEW,
   },
   woreda: {
     dashboard: VIEW, enterprises: vc({ create: true, edit: true }), collection: VIEW,
     review: vc({ approve: true }), gis: VIEW, analytics: NONE, reports: NONE,
     linkage: NONE, benchmark: NONE, notifications: VIEW, users: NONE, audit: NONE, config: NONE,
-    licenses: VIEW, chat: VIEW, advisory: NONE,
+    licenses: VIEW, chat: VIEW, advisory: NONE, integrations: NONE,
   },
   analyst: {
     dashboard: VIEW, enterprises: VIEW, collection: NONE, review: NONE, gis: VIEW,
     analytics: VIEW, reports: vc({ create: true }), linkage: VIEW, benchmark: VIEW,
     notifications: VIEW, users: NONE, audit: NONE, config: NONE, licenses: VIEW,
-    chat: VIEW, advisory: VIEW,
+    chat: VIEW, advisory: VIEW, integrations: VIEW,
   },
   enterprise: {
     dashboard: VIEW, enterprises: vc({ edit: true }), collection: VIEW, review: VIEW,
     gis: NONE, analytics: NONE, reports: NONE, linkage: vc({ create: true }), benchmark: NONE,
     notifications: VIEW, users: NONE, audit: NONE, config: NONE, licenses: VIEW,
-    chat: VIEW, advisory: NONE,
+    chat: VIEW, advisory: NONE, integrations: NONE,
   },
 };
 

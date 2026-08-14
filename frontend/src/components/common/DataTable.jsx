@@ -1,26 +1,50 @@
-export default function DataTable({ columns, rows, rowKey = "id", onRowClick }) {
+export default function DataTable({ columns = [], rows, data, rowKey = "id", keyExtractor, onRowClick }) {
+  const items = rows || data || [];
+
   return (
     <div className="table-wrap">
       <table>
         <thead>
           <tr>
-            {columns.map((c) => (
-              <th key={c.key}>{c.label}</th>
-            ))}
+            {columns.map((c, colIdx) => {
+              const headerText = c.label || c.header || `col_${colIdx}`;
+              const headerKey = c.key || c.header || c.label || `th_${colIdx}`;
+              return <th key={headerKey}>{headerText}</th>;
+            })}
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) => (
-            <tr
-              key={row[rowKey]}
-              onClick={onRowClick ? () => onRowClick(row) : undefined}
-              style={onRowClick ? { cursor: "pointer" } : undefined}
-            >
-              {columns.map((c) => (
-                <td key={c.key} data-label={c.label || undefined}>{c.render ? c.render(row) : row[c.key]}</td>
-              ))}
-            </tr>
-          ))}
+          {items.map((row, rowIdx) => {
+            const key = keyExtractor
+              ? keyExtractor(row, rowIdx)
+              : (row && typeof row === "object" && row[rowKey] != null ? row[rowKey] : rowIdx);
+
+            return (
+              <tr
+                key={key}
+                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                style={onRowClick ? { cursor: "pointer" } : undefined}
+              >
+                {columns.map((c, colIdx) => {
+                  const label = c.label || c.header || "";
+                  const cellKey = c.key || c.header || c.label || `td_${colIdx}`;
+                  let content = "—";
+                  if (c.render) {
+                    content = c.render(row);
+                  } else if (c.accessor) {
+                    content = c.accessor(row);
+                  } else if (c.key && row) {
+                    content = row[c.key] ?? "—";
+                  }
+                  return (
+                    <td key={cellKey} data-label={label || undefined}>
+                      {content}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

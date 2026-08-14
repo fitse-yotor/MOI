@@ -86,8 +86,57 @@ export default function Dashboard() {
               }}
             />
           </div>
+
+          {/* ── Live External Data Integration Telemetry Banner ── */}
+          {data.integrationPanel && (
+            <div style={{ marginTop: 18, padding: 18, background: "#f8fafc", borderRadius: 12, border: "1px solid var(--border)", boxShadow: "var(--shadow-xs)" }}>
+              <div className="flexbtw" style={{ marginBottom: 14 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontSize: 20 }}>🔌</span>
+                  <div>
+                    <h3 style={{ fontSize: 15, fontWeight: 800, color: "var(--primary-dark)", margin: 0 }}>
+                      Live External Data Integration Telemetry
+                    </h3>
+                    <div style={{ fontSize: 12, color: "var(--text2)" }}>
+                      Real-time sync status across ERCA Tax API, EIC FDI Portal, Customs CSV, and Ethio Telecom Fiber
+                    </div>
+                  </div>
+                </div>
+                <span className="badge success">
+                  {data.integrationPanel.connectorHealth?.healthy}/{data.integrationPanel.connectorHealth?.total} Channels Operational
+                </span>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+                <div style={{ padding: "12px 14px", background: "#fff", borderRadius: 8, border: "1px solid var(--border)" }}>
+                  <div style={{ fontSize: 11, color: "var(--text2)", fontWeight: 600 }}>Total Ingested Records</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: "var(--primary)", marginTop: 4 }}>
+                    {data.integrationPanel.totalRecordsSynced?.toLocaleString() || 0}
+                  </div>
+                </div>
+
+                <div style={{ padding: "12px 14px", background: "#fff", borderRadius: 8, border: "1px solid var(--border)" }}>
+                  <div style={{ fontSize: 11, color: "var(--text2)", fontWeight: 600 }}>Synced FDI Capital Pipeline</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: "#059669", marginTop: 4 }}>
+                    ${((data.integrationPanel.totalFdiCapitalUsd || 0) / 1_000_000).toFixed(1)}M USD
+                  </div>
+                </div>
+
+                <div style={{ padding: "12px 14px", background: "#fff", borderRadius: 8, border: "1px solid var(--border)" }}>
+                  <div style={{ fontSize: 11, color: "var(--text2)", fontWeight: 600 }}>Recent Connector Sync</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--primary-dark)", marginTop: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {data.integrationPanel.recentSyncs?.[0]?.name || "All connectors active"}
+                  </div>
+                  <div style={{ fontSize: 11, color: "var(--text2)", marginTop: 2 }}>
+                    +{data.integrationPanel.recentSyncs?.[0]?.updated || 0} records updated
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       )}
     </DataState>
   );
 }
+

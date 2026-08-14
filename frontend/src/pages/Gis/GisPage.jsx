@@ -135,6 +135,9 @@ export default function GisPage() {
   const { data: baseData } = useApiGet("/gis/points", { deps: [] });
   const filterOptions = baseData?.filters || { regions: [], sectors: [], sizes: [] };
 
+  /* ── Park connectivity enrichment (fiber + FDI) ── */
+  const { data: parkConn } = useApiGet("/integrations/enriched/park-connectivity");
+
   /* ── Industry tab data ── */
   const indQuery = buildQuery({ region: indRegion, sector: indSector, size: indSize });
   const { data: indData, loading: indLoading, error: indError, refetch: indRefetch } = useApiGet(
@@ -275,11 +278,39 @@ export default function GisPage() {
                       </Popup>
                     </Marker>
                   ))}
-                  {mode === "infrastructure" && visibleInfra.map((p) => (
-                    <Marker key={`inf-${p.id}`} position={[p.lat, p.lng]} icon={infraIcon(infra?.categories?.[p.category]?.color || "#64748b")} eventHandlers={{ click: () => setSelected({ type: "infra", item: p }) }}>
-                      <Popup><strong>{p.name}</strong><br />{p.status} · {p.capacity}</Popup>
-                    </Marker>
-                  ))}
+                  {mode === "infrastructure" && visibleInfra.map((p) => {
+                    // Enrich park popups with fiber + FDI data
+                    const conn = parkConn?.[p.name];
+                    return (
+                      <Marker key={`inf-${p.id}`} position={[p.lat, p.lng]} icon={infraIcon(infra?.categories?.[p.category]?.color || "#64748b")} eventHandlers={{ click: () => setSelected({ type: "infra", item: p }) }}>
+                        <Popup minWidth={240}>
+                          <strong style={{ fontSize: 13 }}>{p.name}</strong><br />
+                          <span style={{ fontSize: 11, color: "#64748b" }}>{p.status} · {p.capacity}</span>
+                          {conn && (
+                            <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #e2e8f0" }}>
+                              <div style={{ fontSize: 10.5, fontWeight: 700, color: "#0369a1", marginBottom: 5, textTransform: "uppercase", letterSpacing: "0.05em" }}>Live Integration Data</div>
+                              <div style={{ fontSize: 11.5, display: "grid", gap: 3 }}>
+                                <div><span style={{ color: "#64748b" }}>Fiber:</span> <strong>{conn.bandwidthGbps} Gbps</strong> · {conn.fiberRingType}</div>
+                                <div><span style={{ color: "#64748b" }}>Status:</span> <span style={{ color: conn.fiberStatus === "ACTIVE" ? "#059669" : "#d97706", fontWeight: 700 }}>{conn.fiberStatus}</span></div>
+                                <div><span style={{ color: "#64748b" }}>Connected:</span> {conn.factoriesConnected} factories</div>
+                              </div>
+                              {conn.fdiInvestors?.length > 0 && (
+                                <div style={{ marginTop: 6, paddingTop: 6, borderTop: "1px dashed #e2e8f0" }}>
+                                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "#7c3aed", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.05em" }}>Active FDI Investors</div>
+                                  {conn.fdiInvestors.map((fdi) => (
+                                    <div key={fdi.investmentId} style={{ fontSize: 11, marginBottom: 3, padding: "3px 6px", background: "#f5f3ff", borderRadius: 4 }}>
+                                      <strong>{fdi.company}</strong> · {fdi.country}<br />
+                                      <span style={{ color: "#059669" }}>${(fdi.capitalUsd / 1_000_000).toFixed(1)}M</span> · <span style={{ color: "#64748b" }}>{fdi.sector}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </Popup>
+                      </Marker>
+                    );
+                  })}
                 </MapContainer>
               </div>
 
@@ -364,11 +395,38 @@ export default function GisPage() {
                   ))}
 
                   {/* Infrastructure markers (all, layer-toggled) */}
-                  {visibleInfra.map((p) => (
-                    <Marker key={`minf-${p.id}`} position={[p.lat, p.lng]} icon={infraIcon(infra?.categories?.[p.category]?.color || "#64748b")} eventHandlers={{ click: () => setSelected({ type: "infra", item: p }) }}>
-                      <Popup><strong>{p.name}</strong><br />{p.status} · {p.capacity}</Popup>
-                    </Marker>
-                  ))}
+                  {visibleInfra.map((p) => {
+                    const conn = parkConn?.[p.name];
+                    return (
+                      <Marker key={`minf-${p.id}`} position={[p.lat, p.lng]} icon={infraIcon(infra?.categories?.[p.category]?.color || "#64748b")} eventHandlers={{ click: () => setSelected({ type: "infra", item: p }) }}>
+                        <Popup minWidth={240}>
+                          <strong style={{ fontSize: 13 }}>{p.name}</strong><br />
+                          <span style={{ fontSize: 11, color: "#64748b" }}>{p.status} · {p.capacity}</span>
+                          {conn && (
+                            <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #e2e8f0" }}>
+                              <div style={{ fontSize: 10.5, fontWeight: 700, color: "#0369a1", marginBottom: 5, textTransform: "uppercase", letterSpacing: "0.05em" }}>Live Integration Data</div>
+                              <div style={{ fontSize: 11.5, display: "grid", gap: 3 }}>
+                                <div><span style={{ color: "#64748b" }}>Fiber:</span> <strong>{conn.bandwidthGbps} Gbps</strong> · {conn.fiberRingType}</div>
+                                <div><span style={{ color: "#64748b" }}>Status:</span> <span style={{ color: conn.fiberStatus === "ACTIVE" ? "#059669" : "#d97706", fontWeight: 700 }}>{conn.fiberStatus}</span></div>
+                                <div><span style={{ color: "#64748b" }}>Connected:</span> {conn.factoriesConnected} factories</div>
+                              </div>
+                              {conn.fdiInvestors?.length > 0 && (
+                                <div style={{ marginTop: 6, paddingTop: 6, borderTop: "1px dashed #e2e8f0" }}>
+                                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "#7c3aed", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.05em" }}>Active FDI Investors</div>
+                                  {conn.fdiInvestors.map((fdi) => (
+                                    <div key={fdi.investmentId} style={{ fontSize: 11, marginBottom: 3, padding: "3px 6px", background: "#f5f3ff", borderRadius: 4 }}>
+                                      <strong>{fdi.company}</strong> · {fdi.country}<br />
+                                      <span style={{ color: "#059669" }}>${(fdi.capitalUsd / 1_000_000).toFixed(1)}M</span> · <span style={{ color: "#64748b" }}>{fdi.sector}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </Popup>
+                      </Marker>
+                    );
+                  })}
                 </MapContainer>
               </div>
 
