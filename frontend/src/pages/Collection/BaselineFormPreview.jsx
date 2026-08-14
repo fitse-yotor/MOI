@@ -1,45 +1,61 @@
-import { useApiGet } from "../../api/hooks.js";
-import { Card, CardHead } from "../../components/common/Card.jsx";
-import Badge from "../../components/common/Badge.jsx";
-import Button from "../../components/common/Button.jsx";
-import { DataState } from "../../components/common/StateViews.jsx";
+import NmisQuestionnaireWizard from "./NmisQuestionnaireWizard.jsx";
 
 export default function BaselineFormPreview() {
-  const { data, loading, error, refetch } = useApiGet("/collection/baseline-form");
-
   return (
-    <DataState loading={loading} error={error} onRetry={refetch} isEmpty={!data}>
-      {data && (
-        <Card>
-          <CardHead title={data.title} subtitle={data.sectionLabel} action={<Badge tone="info">{data.savedAt}</Badge>} />
-          <div className="step-tracker">
-            {data.steps.map((s) => (
-              <div className={`step ${s.state}`} key={s.label}>
-                <div className="circ">{s.state === "done" ? "✓" : data.steps.indexOf(s) + 1}</div>
-                <div className="lbl">{s.label}</div>
-              </div>
-            ))}
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+      {/* Header bar with mobile launch button */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: 10,
+          background: "var(--card)",
+          padding: "12px 18px",
+          borderRadius: 12,
+          border: "1px solid var(--border)",
+          boxShadow: "var(--shadow-sm)",
+        }}
+      >
+        <div>
+          <div style={{ fontWeight: 800, fontSize: 15, color: "var(--primary-dark)" }}>
+            NMIS V16 — Official 10-Module Manufacturing Survey
           </div>
-          <div className="form-grid">
-            {data.fields.map((f) => (
-              <div className="form-field" key={f.label}>
-                <label>{f.label}</label>
-                <input defaultValue={f.value} />
-              </div>
-            ))}
+          <div style={{ fontSize: 12, color: "var(--text2)", marginTop: 2 }}>
+            Desktop administration view. Launch the mobile simulator to preview exactly how field enumerators see this form on a smartphone.
           </div>
-          <div className="flexbtw" style={{ marginTop: 20 }}>
-            <span className="muted" style={{ fontSize: 12 }}>
-              Auto-calculated: Total headcount = <strong className="mono">{data.totalHeadcount}</strong>
-            </span>
-            <div style={{ display: "flex", gap: 10 }}>
-              <Button variant="outline" size="sm">Save draft</Button>
-              <Button variant="outline" size="sm">← Previous</Button>
-              <Button size="sm">Next: Products & Sales →</Button>
-            </div>
-          </div>
-        </Card>
-      )}
-    </DataState>
+        </div>
+
+        <a
+          href="/collection/mobile-collector"
+          target="_blank"
+          rel="noreferrer"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "8px 16px",
+            borderRadius: 8,
+            background: "var(--primary)",
+            color: "#fff",
+            fontWeight: 700,
+            fontSize: 13,
+            textDecoration: "none",
+            boxShadow: "0 2px 8px rgba(7,89,133,0.25)",
+            transition: "opacity 0.15s",
+            whiteSpace: "nowrap",
+          }}
+          onMouseOver={(e) => (e.currentTarget.style.opacity = "0.88")}
+          onMouseOut={(e) => (e.currentTarget.style.opacity = "1")}
+        >
+          📱 Open Mobile Simulator ↗
+        </a>
+      </div>
+
+      {/* Desktop form — always shown here */}
+      <NmisQuestionnaireWizard isMobile={false} />
+    </div>
   );
 }

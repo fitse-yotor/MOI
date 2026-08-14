@@ -48,6 +48,8 @@ import LicenseTemplateBuilderPage from "../pages/Licenses/LicenseTemplateBuilder
 
 import TelebirrCheckoutPage from "../pages/Payments/TelebirrCheckoutPage.jsx";
 
+import MobileCollectorStandalonePage from "../pages/Collection/MobileCollectorStandalonePage.jsx";
+
 export default function AppRoutes() {
   return (
     <Routes>
@@ -55,6 +57,7 @@ export default function AppRoutes() {
       <Route path="/apply" element={<Apply />} />
       <Route path="/site-chat" element={<PublicChatPage />} />
       <Route path="/site/:slug" element={<SitePage />} />
+      <Route path="/collection/mobile-collector" element={<MobileCollectorStandalonePage />} />
       <Route path="/payments/:id" element={<ProtectedRoute><TelebirrCheckoutPage /></ProtectedRoute>} />
       <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
         <Route path="/" element={<Dashboard />} />

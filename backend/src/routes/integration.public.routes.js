@@ -15,11 +15,11 @@ router.get("/mock/erca-taxpayers", (req, res) => {
     timestamp: new Date().toISOString(),
     count: 5,
     data: [
-      { taxpayer_tin: "0091234567", registered_name: "Bole Lemi Garments PLC",    compliance_status: "COMPLIANT",     filing_period_year: 2025, revenue_range_etb: "500M - 1B"   },
-      { taxpayer_tin: "0098765432", registered_name: "Awash Wine S.C.",            compliance_status: "COMPLIANT",     filing_period_year: 2025, revenue_range_etb: "250M - 500M" },
-      { taxpayer_tin: "0054321098", registered_name: "Dire Dawa Textiles PLC",     compliance_status: "COMPLIANT",     filing_period_year: 2025, revenue_range_etb: "100M - 250M" },
-      { taxpayer_tin: "0011223344", registered_name: "Mojo Leather Tannery",       compliance_status: "COMPLIANT",     filing_period_year: 2025, revenue_range_etb: "50M - 100M"  },
-      { taxpayer_tin: "0077889900", registered_name: "Ethiopia Steel Works PLC",   compliance_status: "PENDING_AUDIT", filing_period_year: 2024, revenue_range_etb: "500M - 1B"   },
+      { taxpayer_tin: "0091234567", registered_name: "Bole Lemi Garments PLC", compliance_status: "COMPLIANT", filing_period_year: 2025, revenue_range_etb: "500M - 1B" },
+      { taxpayer_tin: "0098765432", registered_name: "Awash Wine S.C.", compliance_status: "COMPLIANT", filing_period_year: 2025, revenue_range_etb: "250M - 500M" },
+      { taxpayer_tin: "0054321098", registered_name: "Dire Dawa Textiles PLC", compliance_status: "COMPLIANT", filing_period_year: 2025, revenue_range_etb: "100M - 250M" },
+      { taxpayer_tin: "0011223344", registered_name: "Mojo Leather Tannery", compliance_status: "COMPLIANT", filing_period_year: 2025, revenue_range_etb: "50M - 100M" },
+      { taxpayer_tin: "0077889900", registered_name: "Ethiopia Steel Works PLC", compliance_status: "PENDING_AUDIT", filing_period_year: 2024, revenue_range_etb: "500M - 1B" },
     ],
   });
 });
@@ -31,10 +31,10 @@ router.get("/mock/eic-fdi", (req, res) => {
     timestamp: new Date().toISOString(),
     count: 4,
     data: [
-      { investment_id: "FDI-2026-089", company_name: "Sino-Ethio Textile Investment Ltd", home_country: "China",       approved_capital_usd: 45000000, industrial_zone_slug: "oromia-hawassa",   sector: "Textile & Apparel",       status: "APPROVED"          },
-      { investment_id: "FDI-2026-092", company_name: "Anadolu Chemical Industries",        home_country: "Turkey",      approved_capital_usd: 28000000, industrial_zone_slug: "dire-dawa",        sector: "Chemicals & Plastics",    status: "UNDER_CONSTRUCTION"},
-      { investment_id: "FDI-2026-104", company_name: "Prism Agro-Processing BV",           home_country: "Netherlands", approved_capital_usd: 18500000, industrial_zone_slug: "amhara-kombolcha", sector: "Food & Beverage",         status: "OPERATIONAL"       },
-      { investment_id: "FDI-2026-115", company_name: "GreenPower Battery Tech",             home_country: "South Korea", approved_capital_usd: 62000000, industrial_zone_slug: "kilinto-pharma",  sector: "Electronics & Metals",    status: "LICENSED"          },
+      { investment_id: "FDI-2026-089", company_name: "Sino-Ethio Textile Investment Ltd", home_country: "China", approved_capital_usd: 45000000, industrial_zone_slug: "oromia-hawassa", sector: "Textile & Apparel", status: "APPROVED" },
+      { investment_id: "FDI-2026-092", company_name: "Anadolu Chemical Industries", home_country: "Turkey", approved_capital_usd: 28000000, industrial_zone_slug: "dire-dawa", sector: "Chemicals & Plastics", status: "UNDER_CONSTRUCTION" },
+      { investment_id: "FDI-2026-104", company_name: "Prism Agro-Processing BV", home_country: "Netherlands", approved_capital_usd: 18500000, industrial_zone_slug: "amhara-kombolcha", sector: "Food & Beverage", status: "OPERATIONAL" },
+      { investment_id: "FDI-2026-115", company_name: "GreenPower Battery Tech", home_country: "South Korea", approved_capital_usd: 62000000, industrial_zone_slug: "kilinto-pharma", sector: "Electronics & Metals", status: "LICENSED" },
     ],
   });
 });
@@ -59,11 +59,11 @@ router.get("/sample-files/customs-export.csv", (req, res) => {
 // ── Sample Telecom Fiber JSON ────────────────────────────────────
 router.get("/sample-files/telecom-fiber.json", (req, res) => {
   res.json([
-    { point_id: "FIBER-HL-01", park_name: "Hawassa Industrial Park",    available_bandwidth_gbps: 100, fiber_ring_type: "Dual Redundant Fiber Ring", status: "ACTIVE",      active_factories_connected: 38 },
-    { point_id: "FIBER-BL-02", park_name: "Bole Lemi Industrial Park",  available_bandwidth_gbps: 100, fiber_ring_type: "Dual Redundant Fiber Ring", status: "ACTIVE",      active_factories_connected: 42 },
-    { point_id: "FIBER-DD-03", park_name: "Dire Dawa Free Trade Zone",  available_bandwidth_gbps: 50,  fiber_ring_type: "Single Core Fiber Ring",     status: "ACTIVE",      active_factories_connected: 19 },
-    { point_id: "FIBER-KM-04", park_name: "Kombolcha Industrial Park",  available_bandwidth_gbps: 40,  fiber_ring_type: "Single Core Fiber Ring",     status: "MAINTENANCE", active_factories_connected: 14 },
-    { point_id: "FIBER-AW-05", park_name: "Adama Industrial Park",      available_bandwidth_gbps: 60,  fiber_ring_type: "Dual Redundant Fiber Ring",  status: "ACTIVE",      active_factories_connected: 27 },
+    { point_id: "FIBER-HL-01", park_name: "Hawassa Industrial Park", available_bandwidth_gbps: 100, fiber_ring_type: "Dual Redundant Fiber Ring", status: "ACTIVE", active_factories_connected: 38 },
+    { point_id: "FIBER-BL-02", park_name: "Bole Lemi Industrial Park", available_bandwidth_gbps: 100, fiber_ring_type: "Dual Redundant Fiber Ring", status: "ACTIVE", active_factories_connected: 42 },
+    { point_id: "FIBER-DD-03", park_name: "Dire Dawa Free Trade Zone", available_bandwidth_gbps: 50, fiber_ring_type: "Single Core Fiber Ring", status: "ACTIVE", active_factories_connected: 19 },
+    { point_id: "FIBER-KM-04", park_name: "Kombolcha Industrial Park", available_bandwidth_gbps: 40, fiber_ring_type: "Single Core Fiber Ring", status: "MAINTENANCE", active_factories_connected: 14 },
+    { point_id: "FIBER-AW-05", park_name: "Adama Industrial Park", available_bandwidth_gbps: 60, fiber_ring_type: "Dual Redundant Fiber Ring", status: "ACTIVE", active_factories_connected: 27 },
   ]);
 });
 
@@ -137,9 +137,9 @@ router.get("/demo-sample-enterprises", (req, res) => {
 // Integration happens when a connector configured with this
 // URL is synced from the Data Integrations page.
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 // GET /api/integrations/demo-seed-enterprise-registry
 // Returns the raw enterprise dataset — just like http://localhost:8999/payload.json would.
+
 router.get("/demo-seed-enterprise-registry", (req, res) => {
   res.json({
     enterprises: DEMO_SEED_SOURCE,
